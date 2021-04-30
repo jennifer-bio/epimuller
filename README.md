@@ -1,13 +1,13 @@
 # epiMuller
 
 
-### Author: 
+##### Author: 
 Jennifer L Havens
-### Purpose: 
+##### Purpose: 
 Visualize frequency of SARS-CoV2 variants, and with phylogenetic context, based on sequencing data, over time using muller plot
-### Language: 
+##### Language: 
 Python3
-## Inputs: 
+##### Inputs: 
 Alingment, collection date, PANGO lineage, Nextstain JSON files, and timetree
 
 ## Quick start
@@ -17,7 +17,7 @@ Best way to run is to run python 00_scripts/mutationLinages_report.py from comma
 
 cd muller_plotting
 
-
+```
 python 00_scripts/mutationLinages_report.py [-h] [-oDir OUTDIRECTORY] -oP OUTPREFIX -n
                                  INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
                                  [-f TRAITOFINTERSTFILE]
@@ -28,10 +28,11 @@ python 00_scripts/mutationLinages_report.py [-h] [-oDir OUTDIRECTORY] -oP OUTPRE
                                  [-c CASES_NAME] [-l {date,time}]
                                  [-lp {Right,Max,Start,End}]
 
-
+```
 
 ## SOME EXAMPLES 
 
+```
 python 00_scripts/mutationLinages_report.py -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 01_defaultAAList -min 50 -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-23.tsv
 
 
@@ -41,7 +42,7 @@ python 00_scripts/mutationLinages_report.py -n 01_inputData -m 01_inputData/NYC_
 python 00_scripts/mutationLinages_report.py -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 03_allS_452mut -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-23.tsv -aa 'S*452*' -min 5 -lp Start
 
 python 00_scripts/mutationLinages_report.py  -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 04_E484K -s 2021-01-01 -e 2021-03-20 -mt 1 -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-03.tsv -aa 'SE484K' -min 10 -lp Max
-
+```
 
 
 
@@ -59,6 +60,7 @@ If you would like to specify color for clade: add col with name: "color" and hex
 
 ## ARGUMENTS  
 
+```
 optional arguments:
   -h, --help            show this help message and exit
 
@@ -118,12 +120,13 @@ Options passed to drawMuller.py:
   -lp {Right,Max,Start,End}, --labelPosition {Right,Max,Start,End}
                         choose position of clade labels (default: Right)
 
-
+```
 
 
 
 ## Only make abundance and hiearchy files 
 
+```
 usage: defineAndCountClades.py [-h] -n INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
                                [-f TRAITOFINTERSTFILE] [-k TRAITOFINTERSTKEY]
                                [-aa AAVOCLIST [AAVOCLIST ...]]
@@ -204,4 +207,4 @@ optional arguments:
   -lp {Right,Max,Start,End}, --labelPosition {Right,Max,Start,End}
                         choose position of clade labels (default: Right)
 
-
+```
