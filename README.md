@@ -13,10 +13,10 @@ Alingment, collection date, PANGO lineage, Nextstain JSON files, and timetree
 
 ## Quick start
 
-Best way to run is to run python 00_scripts/mutationLinages_report.py from command line in muller_plotting folder:
+Best way to run is to run python 00_scripts/mutationLinages_report.py from command line in epiMuller folder:
 
 
-cd muller_plotting
+cd epiMuller
 
 ```
 python 00_scripts/mutationLinages_report.py [-h] [-oDir OUTDIRECTORY] -oP OUTPREFIX -n
