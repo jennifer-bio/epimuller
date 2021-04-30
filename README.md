@@ -1,12 +1,11 @@
 # epiMuller
 
 
-## Author: 
+### Author: 
 Jennifer L Havens
-
-## Purpose: 
+### Purpose: 
 Visualize frequency of SARS-CoV2 variants, and with phylogenetic context, based on sequencing data, over time using muller plot
-## Language: 
+### Language: 
 Python3
 ## Inputs: 
 Alingment, collection date, PANGO lineage, Nextstain JSON files, and timetree
