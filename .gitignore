@@ -1,0 +1,7 @@
+
+*.parstree
+*.mldist
+*.phy
+*.gz
+*.bionj
+*.json
