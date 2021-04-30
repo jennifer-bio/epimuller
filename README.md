@@ -16,9 +16,8 @@ Alingment, collection date, PANGO lineage, Nextstain JSON files, and timetree
 Best way to run is to run python 00_scripts/mutationLinages_report.py from command line in epiMuller folder:
 
 
-cd epiMuller
-
 ```
+cd epiMuller
 python 00_scripts/mutationLinages_report.py [-h] [-oDir OUTDIRECTORY] -oP OUTPREFIX -n
                                  INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
                                  [-f TRAITOFINTERSTFILE]
@@ -55,9 +54,11 @@ If you run into anything else please let me know (jhavens@ucsd.edu)
 	- only takes nextstrain json files - intending to set up to take treetime output
 	- feel free to ignore the undefined.svg that gets made - it is related to checking the size of the text to space out labels
 
-## Addtional features  
+## Addtional features
+##### Color
 If you would like to specify color for clade: add col with name: "color" and hex color value (starting with #) for clades you want to specify.
-
+##### Plot and font size
+In the file: 00_scripts/drawMuller.py ; near top of script change value for desired WIDTH, HEIGHT , LEGENDWIDTH (space on right side of plot for labels), MARGIN, or FONTSIZE variables
 
 ## ARGUMENTS  
 
