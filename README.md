@@ -169,13 +169,14 @@ optional arguments:
   -e ENDDATE, --endDate ENDDATE
                         end date in iso format YYYY-MM-DD or 'lastDate' which
                         is in metadata (default: lastDate)
-
+```
 
 
 
 
 ## Only plot 
 
+```
 usage: drawMuller.py [-h] -p PARENTHIERARCHY_NAME -a ABUNDANCE_NAME
                      [-c CASES_NAME] -o OUTFOLDER [-mt MINTIME]
                      [-min MINTOTALCOUNT] [-l {date,time}]
