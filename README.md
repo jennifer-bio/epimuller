@@ -1,5 +1,6 @@
 # epiMuller
 
+![Muller plot](https://raw.githubusercontent.com/jennifer-bio/epiMuller/main/images/case_scaled_lineages_long.png)
 
 ##### Author: 
 Jennifer L Havens
