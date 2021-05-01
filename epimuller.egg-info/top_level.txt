@@ -1,1 +1,1 @@
-00_scripts
+scripts

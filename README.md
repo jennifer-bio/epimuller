@@ -47,16 +47,18 @@ epimuller  -n 02_inputData -m 02_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 
 ## Known edge cases / featrues to add  
 Known edge cases which are not correctly dealt with or features I intend to add (that I will get around to fixing eventually) 
 If you run into anything else please let me know (jhavens@ucsd.edu)
-
+```
 	- nt_muts ; not set up for nt mutations (only amino acid or trait)
 	- only takes nextstrain json files - intending to set up to take treetime output
 	- feel free to ignore the undefined.svg that gets made - it is related to checking the size of the text to space out labels
+  - add plot and font size to arg options
+```
 
 ## Addtional features
 ##### Color
 If you would like to specify color for clade: in --parentHierarchy_name file (of drawMuller.py input) add col with name: "color" and hex color value (starting with #) for clades you want to specify.
 ##### Plot and font size
-In the file: 00_scripts/drawMuller.py ; near top of script change value for desired WIDTH, HEIGHT , LEGENDWIDTH (space on right side of plot for labels), MARGIN, or FONTSIZE variables
+In the file: scripts/drawMuller.py ; near top of script change value for desired WIDTH, HEIGHT , LEGENDWIDTH (space on right side of plot for labels), MARGIN, or FONTSIZE variables
 ##### Parse GISAID fasta for metadata
 epimuller-parse
 If you have downloaded sequences from GISAID under the search tab, you can parse out the names into a metadata file (format tested as of 2021-04-30)

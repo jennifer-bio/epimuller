@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-version='0.0.2'
+version='0.0.3'
 
 requirements = [
                 "ete3",
@@ -14,13 +14,14 @@ requirements = [
                 "pycairo",
                 "cairosvg",
                 "argparse",
+                "numpy",
 
                 "six"] #could not use ete3 without six
 
 classifiers = [
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Science/Research',
-        "Intended Audience :: Healthcare Industry"
+        "Intended Audience :: Healthcare Industry",
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3.7',
@@ -36,13 +37,13 @@ setup(
     python_requires='>=3.7',
     classifiers=classifiers,
     description="Visualize lineages overtime, with phylogentic context, based on viral genomes",
-    packages=find_packages(),#['00_scripts'],#find_packages(include=['epimuller', 'epimuller.*']),
+    packages=find_packages(),#['scripts'],#find_packages(include=['epimuller', 'epimuller.*']),
     entry_points={
         'console_scripts': [
-            'epimuller=00_scripts.mutationLinages_report:main',
-            'epimuller-draw=00_scripts.drawMuller:main',
-            'epimuller-define=00_scripts.defineAndCountClades:main',
-            'epimuller-parse=00_scripts.parseFastaNames:main',
+            'epimuller=scripts.mutationLinages_report:main',
+            'epimuller-draw=scripts.drawMuller:main',
+            'epimuller-define=scripts.defineAndCountClades:main',
+            'epimuller-parse=scripts.parseFastaNames:main',
         ],
     },
     install_requires=requirements,
