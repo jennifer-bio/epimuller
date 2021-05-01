@@ -8,6 +8,9 @@
 *.fasta
 *.log
 
+undefined.svg
+MANIFEST.in
+
 !data/Hu1.fasta
 
 # Byte-compiled / optimized / DLL files
