@@ -32,13 +32,11 @@ epimuller [-h] [-oDir OUTDIRECTORY] -oP OUTPREFIX -n
 
 #### Examples for full run 
 To prep files for these examples for epimuller look at Example_CommandsFromScratch.txt
-```
-epimuller -n inputData/GISAID_NYCPHL_04_29/02_nextstrainResults -m inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv -oDir 03_results_NYCPHL_April29 -oP 01_defaultAAList -c inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-30.tsv
 
-epimuller -n inputData/GISAID_NYCPHL_04_29/02_nextstrainResults -m inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv -oDir 03_results_NYCPHL_April29 -oP 02_pangolin -c inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-30.tsv --traitOfInterstFile traits.json --traitOfInterstKey lineage -lp Max -min 100 
+```epimuller -n inputData/GISAID_NYCPHL_04_29/02_nextstrainResults -m inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv -oDir 03_results_NYCPHL_April29 -oP 01_defaultAAList -c inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-30.tsv```
+```epimuller -n inputData/GISAID_NYCPHL_04_29/02_nextstrainResults -m inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv -oDir 03_results_NYCPHL_April29 -oP 02_pangolin -c inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-30.tsv --traitOfInterstFile traits.json --traitOfInterstKey lineage -lp Max -min 100 ```
+```epimuller -n inputData/GISAID_NYCPHL_04_29/02_nextstrainResults -m inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv -oDir 03_results_NYCPHL_April29 -oP 03_selectedAA -min 50 -c inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-30.tsv -aa 'SE484K' 'S*452*' -mt 20```
 
-epimuller -n inputData/GISAID_NYCPHL_04_29/02_nextstrainResults -m inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv -oDir 03_results_NYCPHL_April29 -oP 03_selectedAA -min 50 -c inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-30.tsv -aa 'SE484K' 'S*452*' -mt 20
-```
 
 
 ## Known edge cases / featrues to add  
@@ -179,9 +177,9 @@ optional arguments:
 
 ```
 usage: epimuller-draw [-h] -p PARENTHIERARCHY_NAME -a ABUNDANCE_NAME
-										 [-c CASES_NAME] -o OUTFOLDER [-mt MINTIME]
-										 [-min MINTOTALCOUNT] [-l {date,time}]
-										 [-lp {Right,Max,Start,End}]
+	 [-c CASES_NAME] -o OUTFOLDER [-mt MINTIME]
+	 [-min MINTOTALCOUNT] [-l {date,time}]
+	 [-lp {Right,Max,Start,End}]
 
 optional arguments:
 	-h, --help            show this help message and exit
