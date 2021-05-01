@@ -1,6 +1,0 @@
-[console_scripts]
-epimuller = scripts.mutationLinages_report:main
-epimuller-define = scripts.defineAndCountClades:main
-epimuller-draw = scripts.drawMuller:main
-epimuller-parse = scripts.parseFastaNames:main
-
