@@ -91,7 +91,8 @@ def main():
 
 	print("\n ### Call command ###")
 	print(oscommand)
-	os.system(oscommand)
+	if os.system(oscommand) != 0:
+		sys.exit("epimuller-define failed")
 
 
 	##########################  call drawMuller.py

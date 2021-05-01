@@ -60,8 +60,8 @@ def makeColor():
 	color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
 	return color
 
-def timeToX(time, scaleTime):
-	return(scaleTime*(int(time) - int(args.MINTIME)) + MARGIN)
+def timeToX(time, scaleTime, minTime):
+	return(scaleTime*(int(time) - int(minTime)) + MARGIN)
 
 
 
@@ -99,7 +99,7 @@ def textheight(text, fontsize):
 # 	shape_l	= []
 # 	return shape_l	
 
-def drawWrapper(outFolder, outPrefix, root_clades_l, scaleTime, times_l, maxY):
+def drawWrapper(outFolder, outPrefix, root_clades_l, scaleTime, times_l, maxY, minTime, labelPosition, xlabel, timeToDate_d):
 
 	#Draw background
 
@@ -110,18 +110,18 @@ def drawWrapper(outFolder, outPrefix, root_clades_l, scaleTime, times_l, maxY):
 	img.add(img.polyline(points = [(0,0), (0, HEIGHT), (WIDTH, HEIGHT), (WIDTH, 0)], stroke='black', fill = 'white'))
 	#img.add(img.text(text = 'Legend', insert = (WIDTH-LEGENDWIDTH, LEGENDWIDTH), font_size=24))
 	#rightWidth = (WIDTH-(MARGIN + LEGENDWIDTH + 1/scaleTime)) #WIDTH - (MARGIN + LEGENDWIDTH) 
-	rightWidth = timeToX(list(times_l)[-1], scaleTime)
+	rightWidth = timeToX(list(times_l)[-1], scaleTime, minTime)
 	img.add(img.polyline(points = [(MARGIN,MARGIN), (MARGIN, HEIGHT-MARGIN), (rightWidth, HEIGHT-MARGIN), (rightWidth, MARGIN), (MARGIN,MARGIN)], stroke='black', stroke_width=5, fill="white"))
 
 
 	#draw clades
-	img, x_labelCord_l, y_labelCord_l, label_l = extractCord_draw(root_clades_l, img, scaleTime, [], [], [])
+	img, x_labelCord_l, y_labelCord_l, label_l = extractCord_draw(root_clades_l, img, scaleTime, [], [], [], times_l, minTime, labelPosition )
 
 
 	tHeight = textheight("TESTLABEL", FONTSIZE)
 	#write clade labels
-	if args.labelPosition == "Right":
-		xpos = timeToX(list(times_l)[-1], scaleTime)+LABELSHIFT
+	if labelPosition == "Right":
+		xpos = timeToX(list(times_l)[-1], scaleTime, minTime)+LABELSHIFT
 
 		zipped = zip(label_l, y_labelCord_l)
 		sort_zip = list(sorted(zipped, key = lambda x: x[1]))
@@ -171,7 +171,7 @@ def drawWrapper(outFolder, outPrefix, root_clades_l, scaleTime, times_l, maxY):
 
 
 	#write x axis labels
-	if args.xlabel == "date":
+	if xlabel == "date":
 		tWidth = textwidth("2021-05-03", FONTSIZE)
 	else:
 		tWidth = textwidth("200", FONTSIZE)
@@ -180,12 +180,12 @@ def drawWrapper(outFolder, outPrefix, root_clades_l, scaleTime, times_l, maxY):
 	for time in times_l:
 		if int(time) % wirteEvery == 0:
 			#if int(time) % int(args.XLABFREQ) == 0:
-			if args.xlabel == "time":
+			if xlabel == "time":
 				label = str(time)
 			else:
 				label = timeToDate_d[time]
-			img.add(img.text(text = label, insert = (timeToX(time, scaleTime),  HEIGHT-MARGIN+(2*LABELSHIFT)), font_size=FONTSIZE))
-			img.add(img.line(start = (timeToX(time, scaleTime),  HEIGHT-MARGIN+LABELSHIFT), end = (timeToX(time, scaleTime),  HEIGHT-(MARGIN+LABELSHIFT)), stroke_width=5, stroke = "black"))
+			img.add(img.text(text = label, insert = (timeToX(time, scaleTime, minTime),  HEIGHT-MARGIN+(2*LABELSHIFT)), font_size=FONTSIZE))
+			img.add(img.line(start = (timeToX(time, scaleTime, minTime),  HEIGHT-MARGIN+LABELSHIFT), end = (timeToX(time, scaleTime, minTime),  HEIGHT-(MARGIN+LABELSHIFT)), stroke_width=5, stroke = "black"))
 	
 	# write title
 	fontsize = FONTSIZE+6
@@ -205,7 +205,7 @@ def drawWrapper(outFolder, outPrefix, root_clades_l, scaleTime, times_l, maxY):
 
 
 
-def extractCord_draw(clades_l, img, scaleTime, x_labelCord_l, y_labelCord_l, label_l):
+def extractCord_draw(clades_l, img, scaleTime, x_labelCord_l, y_labelCord_l, label_l, times_l, minTime, labelPosition ):
 	#for snap in allTimes_l:
 	clade_cord_d = {} #key clade name, value is list of coordinate tuples [... (x2, y2t2), (x1, y2t1), (x1, y1t1), (x2, y1t2) ...]
 	#clade_col_d = {} #key clade name, value is color
@@ -221,7 +221,7 @@ def extractCord_draw(clades_l, img, scaleTime, x_labelCord_l, y_labelCord_l, lab
 			if time in clade.y1_d:
 				y1 = clade.y1_d[time]
 				y2 = clade.y2_d[time]
-				coordinate_l = [(timeToX(time, scaleTime), y1)] + coordinate_l +  [(timeToX(time, scaleTime), y2)]
+				coordinate_l = [(timeToX(time, scaleTime, minTime), y1)] + coordinate_l +  [(timeToX(time, scaleTime, minTime), y2)]
 				abundance = clade.cladeSnapshot_time_d[time].abundance/(1.0*clade.cladeSnapshot_time_d[time].snapshot.sumAll)
 
 				if abundance > 0:
@@ -240,21 +240,21 @@ def extractCord_draw(clades_l, img, scaleTime, x_labelCord_l, y_labelCord_l, lab
 		clade_cord_d[clade.name] = coordinate_l
 
 		if cladeDrawn:
-			if args.labelPosition == "Right":
-				x_cord = timeToX(list(times_l)[-1], scaleTime)+LABELSHIFT
+			if labelPosition == "Right":
+				x_cord = timeToX(list(times_l)[-1], scaleTime, minTime)+LABELSHIFT
 				y1_cord = y1+LABELSHIFT
-			elif args.labelPosition == "Max":
-				x_cord = timeToX(maxAbundance_time, scaleTime) - textwidth(clade.name, FONTSIZE)//2
+			elif labelPosition == "Max":
+				x_cord = timeToX(maxAbundance_time, scaleTime, minTime) - textwidth(clade.name, FONTSIZE)//2
 				if x_cord < 0:
 					x_cord = 0
 				y1_cord = maxAbundance_y
-			elif args.labelPosition == "Start":
-				x_cord = timeToX(startAbundance_time, scaleTime)-(textwidth(clade.name, FONTSIZE))
+			elif labelPosition == "Start":
+				x_cord = timeToX(startAbundance_time, scaleTime, minTime)-(textwidth(clade.name, FONTSIZE))
 				y1_cord = startAbundance_y
 				if x_cord < 0:
 					x_cord = 0
-			elif args.labelPosition == "End":
-				x_cord = timeToX(lastAbundance_time, scaleTime)+LABELSHIFT
+			elif labelPosition == "End":
+				x_cord = timeToX(lastAbundance_time, scaleTime, minTime)+LABELSHIFT
 				if x_cord < 0:
 					x_cord = 0
 				y1_cord = lastAbundance_y
@@ -270,7 +270,7 @@ def extractCord_draw(clades_l, img, scaleTime, x_labelCord_l, y_labelCord_l, lab
 		
 		img.add(img.polyline(points = coordinate_l, stroke='black', stroke_width=0, fill=clade.color))
 
-		img, x_labelCord_l, y_labelCord_l, label_l = extractCord_draw(clade.children, img, scaleTime, x_labelCord_l, y_labelCord_l, label_l)
+		img, x_labelCord_l, y_labelCord_l, label_l = extractCord_draw(clade.children, img, scaleTime, x_labelCord_l, y_labelCord_l, label_l, times_l, minTime, labelPosition )
 
 
 	return(img, x_labelCord_l, y_labelCord_l, label_l)
@@ -342,13 +342,13 @@ def defineChildBoundries(time, scaleFactor, parentCladeSnap, y1_parent, y2_paren
 
 	acountedHeight = y1_parent
 	for childClade in parentCladeSnap.clade.children:
-		childCladeSnap = childClade.cladeSnapshot_time_d[snap.time]
+		childCladeSnap = childClade.cladeSnapshot_time_d[time]
 		y1 =  acountedHeight + parentEdgeHeight
 		y2 = y1 + (scaleFactor*childCladeSnap.sumDescendant)
 		acountedHeight += parentEdgeHeight + (scaleFactor*childCladeSnap.sumDescendant)
 		childClade.y1_d[time] = y1
 		childClade.y2_d[time] = y2
-		defineChildBoundries(snap.time, scaleFactor, childCladeSnap, y1, y2)
+		defineChildBoundries(time, scaleFactor, childCladeSnap, y1, y2)
 
 
 def main():
@@ -543,7 +543,7 @@ def main():
 
 
 	scaleTime = (WIDTH-(MARGIN+LEGENDWIDTH))/len(times_l)
-	drawWrapper(args.outFolder, "relative_abundance", root_clades_l, scaleTime, times_l, 100)
+	drawWrapper(args.outFolder, "relative_abundance", root_clades_l, scaleTime, times_l, 100, args.MINTIME, args.labelPosition, args.xlabel, timeToDate_d)
 
 
 
@@ -591,7 +591,7 @@ def main():
 
 
 	scaleTime = (WIDTH-(MARGIN+LEGENDWIDTH))/len(times_l)
-	drawWrapper(args.outFolder, "sequence_scaled_lineages", root_clades_l, scaleTime, times_l, maxCount)
+	drawWrapper(args.outFolder, "sequence_scaled_lineages", root_clades_l, scaleTime, times_l, maxCount,   args.MINTIME, args.labelPosition, args.xlabel, timeToDate_d)
 
 
 
@@ -663,7 +663,7 @@ def main():
 
 
 		scaleTime = (WIDTH-(MARGIN+LEGENDWIDTH))/len(times_l)
-		drawWrapper(args.outFolder, "case_scaled_lineages", root_clades_l, scaleTime, times_l, maxCount)
+		drawWrapper(args.outFolder, "case_scaled_lineages", root_clades_l, scaleTime, times_l, maxCount, args.MINTIME, args.labelPosition, args.xlabel, timeToDate_d)
 	else:
 		print("No case data supplied - skipping case scaled plot")
 

@@ -14,7 +14,7 @@ from statistics import mode
 
 
 
-def nwkToAnnotNameNWK(t, j_d, trait, inMeta_name, pangolin):
+def nwkToAnnotNameNWK(t, j_d, trait, inMeta_name, pangolin, indexToGene, geneToIndex):
 	'''
 	Input: ete3 tree with node names that have 'trait' of clade specified in j_d
 	Outputs: tree with trait appened to node names
@@ -105,7 +105,7 @@ def nwkToAnnotNameNWK(t, j_d, trait, inMeta_name, pangolin):
 	return(t, firstDate, lastDate)
 
 
-def assignToSpecAA(t, mutList):
+def assignToSpecAA(t, mutList, geneToIndex, logNotes_open):
 	'''
 	(assignment_d: key: leaf node name; value: clade) and heierarchy (heiarchy_d: key:child clade; value:parent clade )
 	'''
@@ -405,13 +405,15 @@ def main():
 	#########################  load nwk files
 
 	print(inTree_name)
+	if not os.path.exists(inTree_name):
+		sys.exit("missing input tree")
 	t = Tree(inTree_name, format = 3)
 
 
 	j_d = json.load(open(inJSON_name))
 
 	
-	t, firstDate, lastDate = nwkToAnnotNameNWK(t, j_d, args.traitOfInterstKey, inMeta_name, pangolin)
+	t, firstDate, lastDate = nwkToAnnotNameNWK(t, j_d, args.traitOfInterstKey, inMeta_name, pangolin, indexToGene, geneToIndex)
 
 	if args.startDate == "firstDate":
 		startDate = firstDate
@@ -445,7 +447,7 @@ def main():
 		logNotes_open.write("\n"+"Searching for muations with:"+str(aa_mut)+"\n")
 
 
-		assignment_d, heiarchy_d, clade_s = assignToSpecAA(t, aa_mut)
+		assignment_d, heiarchy_d, clade_s = assignToSpecAA(t, aa_mut, geneToIndex, logNotes_open)
 	else:
 		logNotes_open.write("\n"+"Finding clades defined by"+str(args.traitOfInterstKey)+"\n")
 		assignment_d, heiarchy_d, clade_s = assignToTraits(t)

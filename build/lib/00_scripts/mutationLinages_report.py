@@ -37,7 +37,7 @@ def main():
 	global_group.add_argument('-oP', '--outPrefix', required=True, type=str, help="prefix of out files withen outDirectory")
 
 
-	defClades_group  = parser.add_argument_group('Options passed to defineAndCountClades.py')
+	defClades_group  = parser.add_argument_group('Options passed to epimuller-define')
 
 	defClades_group.add_argument('-n', '--inNextstrain', required=True, type=str, help="nextstrain results with tree.nwk and [traitOfInterst].json")
 	defClades_group.add_argument('-m', '--inMeta', required=True, type=str, help="metadata tsv with 'strain'	and 'date'cols, optional: cols of trait of interst; and pangolin col named: 'lineage' or 'pangolin_lin'")
@@ -56,7 +56,7 @@ def main():
 
 	##########################  command line args for drawMuller.py
 
-	drawing_group  = parser.add_argument_group('Options passed to drawMuller.py')
+	drawing_group  = parser.add_argument_group('Options passed to epimuller-draw')
 
 	drawing_group.add_argument('-mt', '--MINTIME', required=False, type=str, default="30", help="minimum time point to start plotting")
 	drawing_group.add_argument('-min', '--MINTOTALCOUNT', required=False, type=str, default="10", help="minimum total count for group to be included")
@@ -75,7 +75,11 @@ def main():
 
 
 
-	oscommand = " ".join(["python 00_scripts/defineAndCountClades.py --outDirectory", args.outDirectory , "--outPrefix", args.outPrefix ,
+	# oscommand = " ".join(["python 00_scripts/defineAndCountClades.py --outDirectory", args.outDirectory , "--outPrefix", args.outPrefix ,
+	#  "--inNextstrain", args.inNextstrain , "--inMeta", args.inMeta , "--inPangolin", args.inPangolin , 
+	#  "--traitOfInterstFile", args.traitOfInterstFile , "--traitOfInterstKey", args.traitOfInterstKey , "--timeWindow", args.timeWindow ,
+	#  "--startDate", args.startDate ,"--endDate", args.endDate])
+	oscommand = " ".join(["epimuller-define --outDirectory", args.outDirectory , "--outPrefix", args.outPrefix ,
 	 "--inNextstrain", args.inNextstrain , "--inMeta", args.inMeta , "--inPangolin", args.inPangolin , 
 	 "--traitOfInterstFile", args.traitOfInterstFile , "--traitOfInterstKey", args.traitOfInterstKey , "--timeWindow", args.timeWindow ,
 	 "--startDate", args.startDate ,"--endDate", args.endDate])
@@ -98,9 +102,13 @@ def main():
 	plot_folder = os.path.join(args.outDirectory, args.outPrefix+ "_PLOTS", "")
 
 
-	oscommand = " ".join(["python 00_scripts/drawMuller.py --parentHierarchy_name", outCladeHierarchy_name, "--abundance_name", outCounts_name, "--outFolder", plot_folder,
+	# oscommand = " ".join(["python 00_scripts/drawMuller.py --parentHierarchy_name", outCladeHierarchy_name, "--abundance_name", outCounts_name, "--outFolder", plot_folder,
+	# 	"--xlabel", args.xlabel, "--labelPosition", args.labelPosition, "--MINTIME", args.MINTIME, "--MINTOTALCOUNT", 
+	# 	args.MINTOTALCOUNT, "--xlabel", args.xlabel , "--labelPosition", args.labelPosition])
+	oscommand = " ".join(["epimuller-draw --parentHierarchy_name", outCladeHierarchy_name, "--abundance_name", outCounts_name, "--outFolder", plot_folder,
 		"--xlabel", args.xlabel, "--labelPosition", args.labelPosition, "--MINTIME", args.MINTIME, "--MINTOTALCOUNT", 
 		args.MINTOTALCOUNT, "--xlabel", args.xlabel , "--labelPosition", args.labelPosition])
+
 	if args.cases_name is not None:
 		oscommand = oscommand + " --cases_name " + args.cases_name
 	

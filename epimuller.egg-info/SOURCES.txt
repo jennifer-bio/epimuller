@@ -1,3 +1,4 @@
+MANIFEST.in
 README.md
 setup.py
 00_scripts/__init__.py
@@ -5,6 +6,8 @@ setup.py
 00_scripts/drawMuller.py
 00_scripts/mutationLinages_report.py
 00_scripts/parseFastaNames.py
+01_refData/Hu-1.gb
+01_refData/hu1.fasta
 epimuller.egg-info/PKG-INFO
 epimuller.egg-info/SOURCES.txt
 epimuller.egg-info/dependency_links.txt
