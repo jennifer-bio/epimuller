@@ -1,0 +1,61 @@
+
+Download from GISAID search
+
+conda activate pangolin
+pangolin 02_inputData/GISAID_NYCPHL_04_29/gisaid_hcov-19_2021_04_30_00.fasta -o 02_inputData/GISAID_NYCPHL_04_29 --max-ambig 75
+
+epimuller-parse -iF 02_inputData/GISAID_NYCPHL_04_29/gisaid_hcov-19_2021_04_30_00.fasta -oM 02_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv -oF 02_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.fasta -p 02_inputData/GISAID_NYCPHL_04_29/lineage_report.csv
+
+
+mafft --6merpair --keeplength --addfragments 02_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.fasta  01_refData/hu1.fasta > 02_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename_aln.fasta
+
+
+[PATHTOIQTREE2]/iqtree-2.0.4-Linux/bin/iqtree2 -s 02_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename_aln.fasta -m GTR+F+G -fast -pre 02_inputData/GISAID_NYCPHL_04_29/IQtree2_April29_fast_GTRFG -T 4 
+
+
+conda activate nextstrain
+mkdir 02_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults
+augur refine \
+--tree 02_inputData/GISAID_NYCPHL_04_29/IQtree2_April29_fast_GTRFG.treefile \
+--alignment 02_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename_aln.fasta \
+--metadata 02_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv \
+--output-tree 02_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults/tree.nwk \
+--output-node-data 02_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults/branch_lengths.json \
+--timetree \
+--clock-rate 0.0008 \
+--clock-std-dev 0.0004 \
+--coalescent skyline \
+--date-confidence \
+--date-inference marginal \
+--clock-filter-iqd 4 \
+--no-covariance
+
+augur ancestral \
+--tree 02_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults/tree.nwk \
+--alignment 02_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename_aln.fasta \
+--output-node-data 02_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults/nt_muts.json \
+--inference joint
+
+
+augur translate \
+--tree 02_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults/tree.nwk \
+--ancestral-sequences 02_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults/nt_muts.json \
+--reference-sequence  01_refData/Hu-1.gb \
+--output-node-data 02_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults/aa_muts.json
+
+conda activate datetime
+epimuller -n 02_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults -m 02_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv -oDir 03_results_NYCPHL_April29 -oP 01_defaultAAList -min 50 -c 02_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-30.tsv
+
+
+
+-----------------------------------------
+
+conda activate nextstrain
+augur traits \
+--tree 02_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults/tree.nwk \
+--metadata 02_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv \
+--output-node-data 02_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults/traits.json \
+--columns lineage
+
+conda activate datetime
+epimuller -n 02_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults -m 02_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv -oDir 03_results_NYCPHL_April29 -oP 02_pangolin -min 100 -c 02_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-30.tsv --traitOfInterstFile traits.json --traitOfInterstKey lineage -lp Max

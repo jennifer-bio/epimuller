@@ -39,15 +39,15 @@ Description: # epiMuller
         ## SOME EXAMPLES 
         
         ```
-        epimuller -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 01_defaultAAList -min 50 -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-23.tsv
+        epimuller -n 02_inputData -m 02_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 03_results -oP 01_defaultAAList -min 50 -c 02_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-23.tsv
         
         
-        epimuller -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 02_traits -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-23.tsv --traitOfInterstFile temp_subclades.json --traitOfInterstKey clade_membership -l time -mt 40
+        epimuller -n 02_inputData -m 02_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 03_results -oP 02_traits -c 02_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-23.tsv --traitOfInterstFile temp_subclades.json --traitOfInterstKey clade_membership -l time -mt 40
         
         
-        epimuller -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 03_allS_452mut -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-23.tsv -aa 'S*452*' -min 5 -lp Start
+        epimuller -n 02_inputData -m 02_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 03_results -oP 03_allS_452mut -c 02_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-23.tsv -aa 'S*452*' -min 5 -lp Start
         
-        epimuller  -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 04_E484K -s 2021-01-01 -e 2021-03-20 -mt 1 -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-03.tsv -aa 'SE484K' -min 10 -lp Max
+        epimuller  -n 02_inputData -m 02_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 03_results -oP 04_E484K -s 2021-01-01 -e 2021-03-20 -mt 1 -c 02_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-03.tsv -aa 'SE484K' -min 10 -lp Max
         ```
         
         
