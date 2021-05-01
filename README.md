@@ -5,7 +5,7 @@
 ##### Author: 
 Jennifer L Havens
 ##### Purpose: 
-Visualize frequency of SARS-CoV2 variants, and with phylogenetic context, based on sequencing data, over time using muller plot
+Visualize lineages overtime, with phylogentic context, based on viral genomes
 ##### Language: 
 Python3
 ##### Inputs: 
@@ -13,12 +13,10 @@ Alingment, collection date, PANGO lineage, Nextstain JSON files, and timetree
 
 ## Quick start
 
-Best way to run is to run python 00_scripts/mutationLinages_report.py from command line in epiMuller folder:
-
-
 ```
-cd epiMuller
-python 00_scripts/mutationLinages_report.py [-h] [-oDir OUTDIRECTORY] -oP OUTPREFIX -n
+pip install epimuller
+
+epimuller [-h] [-oDir OUTDIRECTORY] -oP OUTPREFIX -n
                                  INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
                                  [-f TRAITOFINTERSTFILE]
                                  [-k TRAITOFINTERSTKEY]
@@ -33,15 +31,15 @@ python 00_scripts/mutationLinages_report.py [-h] [-oDir OUTDIRECTORY] -oP OUTPRE
 ## SOME EXAMPLES 
 
 ```
-python 00_scripts/mutationLinages_report.py -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 01_defaultAAList -min 50 -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-23.tsv
+epimuller -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 01_defaultAAList -min 50 -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-23.tsv
 
 
-python 00_scripts/mutationLinages_report.py -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 02_traits -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-23.tsv --traitOfInterstFile temp_subclades.json --traitOfInterstKey clade_membership -l time -mt 40
+epimuller -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 02_traits -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-23.tsv --traitOfInterstFile temp_subclades.json --traitOfInterstKey clade_membership -l time -mt 40
 
 
-python 00_scripts/mutationLinages_report.py -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 03_allS_452mut -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-23.tsv -aa 'S*452*' -min 5 -lp Start
+epimuller -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 03_allS_452mut -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-23.tsv -aa 'S*452*' -min 5 -lp Start
 
-python 00_scripts/mutationLinages_report.py  -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 04_E484K -s 2021-01-01 -e 2021-03-20 -mt 1 -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-03.tsv -aa 'SE484K' -min 10 -lp Max
+epimuller  -n 01_inputData -m 01_inputData/NYC_PHL_PRL_2021_03_24_ref.tsv -oDir 02_results -oP 04_E484K -s 2021-01-01 -e 2021-03-20 -mt 1 -c 01_inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-03.tsv -aa 'SE484K' -min 10 -lp Max
 ```
 
 
@@ -59,6 +57,10 @@ If you run into anything else please let me know (jhavens@ucsd.edu)
 If you would like to specify color for clade: in --parentHierarchy_name file (of drawMuller.py input) add col with name: "color" and hex color value (starting with #) for clades you want to specify.
 ##### Plot and font size
 In the file: 00_scripts/drawMuller.py ; near top of script change value for desired WIDTH, HEIGHT , LEGENDWIDTH (space on right side of plot for labels), MARGIN, or FONTSIZE variables
+##### Parse GISAID fasta for metadata
+epimuller-parse
+If you have downloaded sequences from GISAID under the search tab, you can parse out the names into a metadata file (format tested as of 2021-04-30)
+
 
 ## ARGUMENTS  
 
@@ -73,7 +75,7 @@ Options for full repot:
                         prefix of out files withen outDirectory (default:
                         None)
 
-Options passed to defineAndCountClades.py:
+Options passed to epimuller-define:
   -n INNEXTSTRAIN, --inNextstrain INNEXTSTRAIN
                         nextstrain results with tree.nwk and
                         [traitOfInterst].json (default: None)
@@ -106,7 +108,7 @@ Options passed to defineAndCountClades.py:
                         sets end date as last date in metadata (default:
                         lastDate)
 
-Options passed to drawMuller.py:
+Options passed to epimuller-draw:
   -mt MINTIME, --MINTIME MINTIME
                         minimum time point to start plotting (default: 30)
   -min MINTOTALCOUNT, --MINTOTALCOUNT MINTOTALCOUNT
@@ -129,7 +131,7 @@ Options passed to drawMuller.py:
 ## Only make abundance and hiearchy files 
 
 ```
-usage: defineAndCountClades.py [-h] -n INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
+usage: epimuller-define [-h] -n INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
                                [-f TRAITOFINTERSTFILE] [-k TRAITOFINTERSTKEY]
                                [-aa AAVOCLIST [AAVOCLIST ...]]
                                [-oDir OUTDIRECTORY] -oP OUTPREFIX
@@ -174,12 +176,10 @@ optional arguments:
 ```
 
 
-
-
 ## Only plot 
 
 ```
-usage: drawMuller.py [-h] -p PARENTHIERARCHY_NAME -a ABUNDANCE_NAME
+usage: epimuller-draw [-h] -p PARENTHIERARCHY_NAME -a ABUNDANCE_NAME
                      [-c CASES_NAME] -o OUTFOLDER [-mt MINTIME]
                      [-min MINTOTALCOUNT] [-l {date,time}]
                      [-lp {Right,Max,Start,End}]
@@ -211,3 +211,11 @@ optional arguments:
                         choose position of clade labels (default: Right)
 
 ```
+
+## Citation
+
+Please [link to this github](https://github.com/jennifer-bio/epimuller) if you have used epimuller in your research. 
+
+#### Extra notes on GISAID
+
+If you do use GISAID data please acknowledge the contributers, such as with [language suggested by GISAID](https://www.gisaid.org/help/publish-with-data-from-gisaid/):

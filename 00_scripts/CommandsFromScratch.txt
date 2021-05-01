@@ -7,7 +7,7 @@ pangolin 01_inputData/GISAID_NYCPHL_04_29/gisaid_hcov-19_2021_04_30_00.fasta -o 
 python ../01_scripts/parseFastaNames.py -iF 01_inputData/GISAID_NYCPHL_04_29/gisaid_hcov-19_2021_04_30_00.fasta -oM 01_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv -oF 01_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.fasta -p 01_inputData/GISAID_NYCPHL_04_29/lineage_report.csv
 
 
-mafft --6merpair --keeplength --addfragments 01_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.fasta  00_scripts/hu1.fasta > 01_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename_aln.fasta
+mafft --6merpair --keeplength --addfragments 01_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.fasta  00_scripts_refSeq/hu1.fasta > 01_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename_aln.fasta
 
 
 /mnt/c/Users/hjenn/Documents/1_UCSD/Research/Tools/iqtree-2.0.4-Linux/bin/iqtree2 -s 01_inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename_aln.fasta -m GTR+F+G -fast -pre 01_inputData/GISAID_NYCPHL_04_29/IQtree2_April29_fast_GTRFG -T 4 
@@ -40,7 +40,7 @@ augur ancestral \
 augur translate \
 --tree 01_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults/tree.nwk \
 --ancestral-sequences 01_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults/nt_muts.json \
---reference-sequence  00_scripts/Hu-1.gb \
+--reference-sequence  00_scripts_refSeq/Hu-1.gb \
 --output-node-data 01_inputData/GISAID_NYCPHL_04_29/02_nextstrainResults/aa_muts.json
 
 conda activate datetime
