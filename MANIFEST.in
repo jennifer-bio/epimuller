@@ -1,4 +1,0 @@
-recursive-include data *
-
-include LICENSE.txt
-include scripts/Example_CommandsFromScratch.txt
