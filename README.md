@@ -58,7 +58,6 @@ epimuller \
 ##### Visulize a trait: lineage 
 
 ```
-
 epimuller \
 	-n inputData/GISAID_NYCPHL_04_29/02_nextstrainResults \
 	-m inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv \
@@ -75,7 +74,6 @@ epimuller \
 ##### Visulize your own aa mutation list
 
 ```
-
 epimuller \
 	-n inputData/GISAID_NYCPHL_04_29/02_nextstrainResults \
 	-m inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv \
