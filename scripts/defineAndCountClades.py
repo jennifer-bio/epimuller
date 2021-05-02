@@ -107,7 +107,10 @@ def nwkToAnnotNameNWK(t, j_d, trait, inMeta_name, pangolin, indexToGene, geneToI
 
 def assignToSpecAA(t, mutList, geneToIndex, logNotes_open):
 	'''
-	(assignment_d: key: leaf node name; value: clade) and heierarchy (heiarchy_d: key:child clade; value:parent clade )
+	input: annotated tree (t) and aa mut (mutList) to look for
+	output:
+	assignment_d: key: leaf node name; value: clade
+	heierarchy (heiarchy_d: key:child clade; value:parent clade )
 	'''
 	clade_s = set()
 	assignment_d = {}
@@ -172,8 +175,11 @@ def assignToSpecAA(t, mutList, geneToIndex, logNotes_open):
 
 def assignToTraits(t, ofInterst_l = []):
 	'''
-	(assignment_d: key: leaf node name; value: clade) and heierarchy (heiarchy_d: key:child clade; value:parent clade )
-	calde naming: trait_index
+	input: annotated tree (t) 
+	Not currntly functional: if ofInterst_l is not empty only initialize when node has trait in least
+	output:
+	assignment_d: key: leaf node name; value: clade
+	heierarchy (heiarchy_d: key:child clade; value:parent clade )
 	'''
 	clade_s = set()
 	assignment_d = {}
@@ -218,7 +224,9 @@ def assignToTraits(t, ofInterst_l = []):
 
 
 def assignCladeToLin(assignment_old_d, heiarchy_old_d, clade_old_s):
-
+	"""
+	mode of Pangolin linage of tips withen clade are appended to clade names
+	"""
 
 	reassignCladeNames ={}
 	clade_s = set()
@@ -258,6 +266,9 @@ def assignCladeToLin(assignment_old_d, heiarchy_old_d, clade_old_s):
 
 
 def countAbudanceFromNames_byWeek(assignment_d, clade_s, startDate, endDate, delta, tipLog_name):
+	"""
+	counts total number of tips withen each clade, for each time interval (delta) between startDate and endDate 
+	"""
 	abundances_d = {} # key: week; value: dict of key:clade; value: count
 	weekToDate_d = {}
 	#assignment_d: key: node name; value: clade

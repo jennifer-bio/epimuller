@@ -6,6 +6,10 @@ import sys
 
 
 def main():
+	"""
+	Input: fasta with sequence id that has "|isodate" suffix
+	Output: metadat file that can be input into nextstrain (as downloaded 2021-02-01) fasta with "|" to "_" 
+	"""
 
 	# parse user arguments
 	parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
