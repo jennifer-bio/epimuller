@@ -127,7 +127,7 @@ Plot and font size
 
 In the file: scripts/drawMuller.py ; near top of script change value for
 desired WIDTH, HEIGHT , LEGENDWIDTH (space on right side of plot for
-labels), MARGIN, or FONTSIZE variables Then run with source code by >
+labels), MARGIN, or FONTSIZE variables. Then run with source code by >
 python scripts/drawMuller.py [Arugments]
 
 Parse GISAID fasta for metadata

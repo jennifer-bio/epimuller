@@ -90,7 +90,7 @@ If you run into anything else please let me know on https://github.com/jennifer-
 If you would like to specify color for clade: in --parentHierarchy_name file (of drawMuller.py input) add col with name: "color" and hex color value (starting with #) for clades you want to specify.
 
 ##### Plot and font size
-In the file: scripts/drawMuller.py ; near top of script change value for desired WIDTH, HEIGHT , LEGENDWIDTH (space on right side of plot for labels), MARGIN, or FONTSIZE variables
+In the file: scripts/drawMuller.py ; near top of script change value for desired WIDTH, HEIGHT , LEGENDWIDTH (space on right side of plot for labels), MARGIN, or FONTSIZE variables.
 Then run with source code by > python scripts/drawMuller.py [Arugments]
 
 ##### Parse GISAID fasta for metadata
