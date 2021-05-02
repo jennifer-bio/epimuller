@@ -8,7 +8,7 @@ README
 .. toctree::
    :maxdepth: 2
 
-   README
+   read_me
    
 Indices and code
 ----------------
