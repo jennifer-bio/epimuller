@@ -67,6 +67,9 @@ Examples for full run
 To prep files for these examples for epimuller look at
 Example_CommandsFromScratch.txt
 
+Visulize default aa mutation list
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 ::
 
    epimuller \
@@ -75,6 +78,12 @@ Example_CommandsFromScratch.txt
        -oDir 03_results_NYCPHL_April29 \
        -oP 01_defaultAAList \
        -c inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-30.tsv
+
+Visulize a trait: lineage
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
 
    epimuller \
        -n inputData/GISAID_NYCPHL_04_29/02_nextstrainResults \
@@ -86,6 +95,12 @@ Example_CommandsFromScratch.txt
        --traitOfInterstKey lineage \
        -lp Max \
        -min 100 \
+
+Visulize your own aa mutation list
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
 
    epimuller \
        -n inputData/GISAID_NYCPHL_04_29/02_nextstrainResults \
