@@ -116,7 +116,7 @@ Known edge cases / featrues to add
 Known edge cases which are not correctly dealt with or features I intend
 to add (that I will get around to fixing eventually) If you run into
 anything else please let me know on
-https://github.com/jennifer-bio/epimuller
+`gitHub <https://github.com/jennifer-bio/epimuller>`__
 
 ::
 

@@ -88,7 +88,7 @@ epimuller \
 
 ## Known edge cases / featrues to add  
 Known edge cases which are not correctly dealt with or features I intend to add (that I will get around to fixing eventually) 
-If you run into anything else please let me know on https://github.com/jennifer-bio/epimuller
+If you run into anything else please let me know on [gitHub](https://github.com/jennifer-bio/epimuller)
 ```
 	- nt_muts ; not set up for nt mutations (only amino acid or trait)
 	- only takes nextstrain json files - intending to set up to take treetime output
