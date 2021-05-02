@@ -19,6 +19,9 @@ Alingment, collection date, PANGO lineage, Nextstain JSON files, and timetree
 ###### Source code avaliblity
 [gitHub](https://github.com/jennifer-bio/epimuller)
 
+###### Documentation avaliblity 
+[Read the Docs](https://epimuller.readthedocs.io/en/stable/)
+
 ## Quick start
 
 ```

@@ -36,6 +36,11 @@ Source code avaliblity
 
 `gitHub <https://github.com/jennifer-bio/epimuller>`__
 
+Documentation avaliblity
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`Read the Docs <https://epimuller.readthedocs.io/en/stable/>`__
+
 Quick start
 -----------
 
