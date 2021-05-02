@@ -1,15 +1,23 @@
-# epiMuller
+# epiMuller README
 
 ![Muller plot image](https://raw.githubusercontent.com/jennifer-bio/epiMuller/main/images/case_scaled_lineages_long.png)
 
-##### Author: 
+##### About
+
+###### Author
 Jennifer L Havens
-##### Purpose: 
+
+###### Purpose
 Visualize lineages overtime, with phylogentic context, based on viral genomes
-##### Language: 
+
+###### Language
 Python3
-##### Inputs: 
+
+###### Inputs
 Alingment, collection date, PANGO lineage, Nextstain JSON files, and timetree
+
+###### Source code avaliblity
+[gitHub](https://github.com/jennifer-bio/epimuller)
 
 ## Quick start
 
@@ -65,7 +73,7 @@ epimuller \
 
 ## Known edge cases / featrues to add  
 Known edge cases which are not correctly dealt with or features I intend to add (that I will get around to fixing eventually) 
-If you run into anything else please let me know (jhavens@ucsd.edu)
+If you run into anything else please let me know on https://github.com/jennifer-bio/epimuller
 ```
 	- nt_muts ; not set up for nt mutations (only amino acid or trait)
 	- only takes nextstrain json files - intending to set up to take treetime output
@@ -74,10 +82,14 @@ If you run into anything else please let me know (jhavens@ucsd.edu)
 ```
 
 ## Addtional features
+
 ##### Color
 If you would like to specify color for clade: in --parentHierarchy_name file (of drawMuller.py input) add col with name: "color" and hex color value (starting with #) for clades you want to specify.
+
 ##### Plot and font size
 In the file: scripts/drawMuller.py ; near top of script change value for desired WIDTH, HEIGHT , LEGENDWIDTH (space on right side of plot for labels), MARGIN, or FONTSIZE variables
+Then run with source code by > python scripts/drawMuller.py [Arugments]
+
 ##### Parse GISAID fasta for metadata
 epimuller-parse
 If you have downloaded sequences from GISAID under the search tab, you can parse out the names into a metadata file (format tested as of 2021-04-30)
@@ -239,4 +251,4 @@ Please [link to this github](https://github.com/jennifer-bio/epimuller) if you h
 
 #### Extra notes on GISAID
 
-If you do use GISAID data please acknowledge the contributers, such as with [language suggested by GISAID](https://www.gisaid.org/help/publish-with-data-from-gisaid/):
+If you do use GISAID data please acknowledge the contributers, such as with [language suggested by GISAID](https://www.gisaid.org/help/publish-with-data-from-gisaid/).

@@ -1,8 +1,5 @@
-scripts package
-===============
-
-Submodules
-----------
+Code documentation
+==================
 
 scripts\.defineAndCountClades module
 ------------------------------------
@@ -32,15 +29,6 @@ scripts\.parseFastaNames module
 -------------------------------
 
 .. automodule:: scripts.parseFastaNames
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Module contents
----------------
-
-.. automodule:: scripts
     :members:
     :undoc-members:
     :show-inheritance:
