@@ -25,7 +25,7 @@ Alingment, collection date, PANGO lineage, Nextstain JSON files, and timetree
 ## Quick start
 
 ```
-pip install epimuller
+pip3 install epimuller
 
 epimuller [-h] [-oDir OUTDIRECTORY] -oP OUTPREFIX -n
 	 INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
