@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-version='0.0.4'
+version='0.0.5'
 
 requirements = [
                 "ete3",
@@ -27,7 +27,6 @@ classifiers = [
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         "Programming Language :: Python :: 3.9",
-        "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Topic :: Scientific/Engineering :: Visualization"]
 
