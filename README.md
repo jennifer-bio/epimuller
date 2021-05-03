@@ -102,8 +102,8 @@ If you run into anything else please let me know on [gitHub](https://github.com/
 If you would like to specify color for clade: in --parentHierarchy_name file (of epimuller-draw/drawMuller.py input) add col with name: "color" and hex color value (starting with #) for clades you want to specify.
 
 ##### Plot and font size
-In the file: scripts/drawMuller.py ; near top of script change value for desired WIDTH, HEIGHT , LEGENDWIDTH (space on right side of plot for labels), MARGIN, or FONTSIZE variables.
-Then run with source code in epimuller folder by $python scripts/drawMuller.py [Arugments]
+In the file: scripts/drawMuller.py ; near top of script change value for desired WIDTH, HEIGHT, LEGENDWIDTH (space on right side of plot for labels), MARGIN, or FONTSIZE variables.
+Then run with source code in epimuller folder by $python3 scripts/drawMuller.py [Arugments]
 
 ##### Parse GISAID fasta for metadata
 epimuller-parse
@@ -257,6 +257,63 @@ optional arguments:
 		from start (default: date)
 	-lp {Right,Max,Start,End}, --labelPosition {Right,Max,Start,End}
 		choose position of clade labels (default: Right)
+
+```
+
+## Install methods
+
+##### With pip
+
+```
+pip3 install epimuller
+
+#If there is an issue with cairo, try:
+
+pip3 install pycairo
+pip3 install epimuller
+```
+
+##### From source
+
+Download source code from [gitHub](https://github.com/jennifer-bio/epimuller) or [pypi](https://pypi.org/project/epimuller/)
+
+```
+#open as needed for download format
+tar -zxvf epimuller-[version].tar.gz
+
+cd epimuller-[version]
+
+python3 setup.py install
+```
+
+##### With Bioconda
+
+Does not work at time of writing
+```
+#conda install -c bioconda epimuller
+```
+
+##### Run scripts directly
+(This is currently the best way to change display and font size)
+Download source code from [gitHub](https://github.com/jennifer-bio/epimuller) or [pypi](https://pypi.org/project/epimuller/)
+
+```
+#open as needed for download format
+tar -zxvf epimuller-[version].tar.gz
+
+cd epimuller-[version]
+
+#to run epimuller
+python3 ./scripts/mutationLinages_report.py [arugments]
+
+#to run epimuller-parse
+python3 ./scripts/parseFastaNames.py  [arugments]
+
+#to run epimuller-define 
+python3 ./scripts/defineAndCountClades.py  [arugments]
+
+#to run epimuller-draw 
+python3 ./scripts/drawMuller.py  [arugments]
 
 ```
 
