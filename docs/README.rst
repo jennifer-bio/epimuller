@@ -341,7 +341,9 @@ Does not work at time of writing
 Run scripts directly
 ~~~~~~~~~~~~~~~~~~~~
 
-(This is currently the best way to change display and font size)
+This is currently the best way to change display and font size, howerver
+you will have to install all dependencies.
+
 Download source code from
 `gitHub <https://github.com/jennifer-bio/epimuller>`__ or
 `pypi <https://pypi.org/project/epimuller/>`__
