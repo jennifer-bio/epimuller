@@ -5,16 +5,23 @@
 ##### About
 
 ###### Author
-Jennifer L Havens
+Jennifer L. Havens
 
 ###### Purpose
-Visualize lineages overtime, with phylogentic context, based on viral genomes
+Visualize lineages overtime, with phylogentic context, based on viral genomes.
 
 ###### Language
 Python3
 
 ###### Inputs
-Alingment, collection date, PANGO lineage, Nextstain JSON files, and timetree
+Aligned viral genomes, collection dates, PANGO lineages, Nextstain JSON file, and timetree
+
+###### Workflow overview
+
+- epimuller-parse (optional): parse fasta names with '*bar* isodate' suffix into usable fasta and metadata files.
+- epimuller: wrapper for epimuller-define and epimuller-draw.
+	 - epimuller-define: assigns samples to clades based on ancestral reconstruction of specified aa mutations or trait (hierarchy), and counts samples withen each time frame (abundance).
+	 - epimuller-draw: plots the frequency clades overtime, as specifed by abundance and hierarchy inputs from epimuller-define.
 
 ###### Source code avaliblity
 [gitHub](https://github.com/jennifer-bio/epimuller)
@@ -42,7 +49,7 @@ epimuller [-h] [-oDir OUTDIRECTORY] -oP OUTPREFIX -n
 ## SOME EXAMPLES 
 
 #### Examples for full run 
-To prep files for these examples for epimuller look at Example_CommandsFromScratch.txt
+To see steps used to prep files for these examples look at scripts/Example_CommandsFromScratch.txt on [gitHub](https://github.com/jennifer-bio/epimuller).
 
 ##### Visulize default aa mutation list
 
@@ -87,13 +94,14 @@ epimuller \
 
 
 ## Known edge cases / featrues to add  
-Known edge cases which are not correctly dealt with or features I intend to add (that I will get around to fixing eventually) 
-If you run into anything else please let me know on [gitHub](https://github.com/jennifer-bio/epimuller)
+Known edge cases which are not correctly dealt with or features I intend to address (eventually).
+If you run into anything else please let me know with an issue on [gitHub](https://github.com/jennifer-bio/epimuller).
 ```
 	- nt_muts ; not set up for nt mutations (only amino acid or trait)
 	- only takes nextstrain json files - intending to set up to take treetime output
 	- feel free to ignore the undefined.svg that gets made - it is related to checking the size of the text to space out labels
 	- add plot and font size to arg options
+	- make avalible with bioconda
 ```
 
 ## Addtional features
@@ -107,10 +115,10 @@ Then run with source code in epimuller folder by $python3 scripts/drawMuller.py 
 
 ##### Parse GISAID fasta for metadata
 epimuller-parse
-If you have downloaded sequences from GISAID under the search tab, you can parse out the names into a metadata file (format tested as of 2021-04-30)
+If you have downloaded sequences from GISAID under the search tab, you can parse out the names into a metadata file (format tested as of 2021-04-30).
 
 
-## ARGUMENTS  
+## epimuller arguments  
 
 ```
 optional arguments:
@@ -176,7 +184,7 @@ Options passed to epimuller-draw:
 
 
 
-## Only make abundance and hiearchy files 
+## epimuller-define: make abundance and hiearchy files 
 
 ```
 usage: epimuller-define [-h] -n INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
@@ -224,7 +232,7 @@ optional arguments:
 ```
 
 
-## Only plot 
+## epimuller-draw: plot
 
 ```
 usage: epimuller-draw [-h] -p PARENTHIERARCHY_NAME -a ABUNDANCE_NAME
@@ -286,13 +294,6 @@ cd epimuller-[version]
 python3 setup.py install
 ```
 
-##### With Bioconda
-
-Does not work at time of writing
-```
-#conda install -c bioconda epimuller
-```
-
 ##### Run scripts directly
 This is currently the best way to change display and font size, howerver you will have to install all dependencies.
 
@@ -316,6 +317,13 @@ python3 ./scripts/defineAndCountClades.py  [arugments]
 #to run epimuller-draw 
 python3 ./scripts/drawMuller.py  [arugments]
 
+```
+
+##### With Bioconda
+
+Does not work at time of writing
+```
+#conda install -c bioconda epimuller
 ```
 
 ## Citation

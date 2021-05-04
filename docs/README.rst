@@ -12,13 +12,13 @@ About
 Author
 ~~~~~~
 
-Jennifer L Havens
+Jennifer L. Havens
 
 Purpose
 ~~~~~~~
 
 Visualize lineages overtime, with phylogentic context, based on viral
-genomes
+genomes.
 
 Language
 ~~~~~~~~
@@ -28,8 +28,21 @@ Python3
 Inputs
 ~~~~~~
 
-Alingment, collection date, PANGO lineage, Nextstain JSON files, and
-timetree
+Aligned viral genomes, collection dates, PANGO lineages, Nextstain JSON
+file, and timetree
+
+Workflow overview
+~~~~~~~~~~~~~~~~~
+
+-  epimuller-parse (optional): parse fasta names with '*bar* isodate'
+   suffix into usable fasta and metadata files.
+-  epimuller: wrapper for epimuller-define and epimuller-draw.
+
+   -  epimuller-define: assigns samples to clades based on ancestral
+      reconstruction of specified aa mutations or trait (hierarchy), and
+      counts samples withen each time frame (abundance).
+   -  epimuller-draw: plots the frequency clades overtime, as specifed
+      by abundance and hierarchy inputs from epimuller-define.
 
 Source code avaliblity
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -64,8 +77,9 @@ SOME EXAMPLES
 Examples for full run
 ~~~~~~~~~~~~~~~~~~~~~
 
-To prep files for these examples for epimuller look at
-Example\_CommandsFromScratch.txt
+To see steps used to prep files for these examples look at
+scripts/Example\_CommandsFromScratch.txt on
+`gitHub <https://github.com/jennifer-bio/epimuller>`__.
 
 Visulize default aa mutation list
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -114,9 +128,9 @@ Known edge cases / featrues to add
 ----------------------------------
 
 Known edge cases which are not correctly dealt with or features I intend
-to add (that I will get around to fixing eventually) If you run into
-anything else please let me know on
-`gitHub <https://github.com/jennifer-bio/epimuller>`__
+to address (eventually). If you run into anything else please let me
+know with an issue on
+`gitHub <https://github.com/jennifer-bio/epimuller>`__.
 
 ::
 
@@ -124,6 +138,7 @@ anything else please let me know on
         - only takes nextstrain json files - intending to set up to take treetime output
         - feel free to ignore the undefined.svg that gets made - it is related to checking the size of the text to space out labels
         - add plot and font size to arg options
+        - make avalible with bioconda
 
 Addtional features
 ------------------
@@ -148,10 +163,10 @@ Parse GISAID fasta for metadata
 
 epimuller-parse If you have downloaded sequences from GISAID under the
 search tab, you can parse out the names into a metadata file (format
-tested as of 2021-04-30)
+tested as of 2021-04-30).
 
-ARGUMENTS
----------
+epimuller arguments
+-------------------
 
 ::
 
@@ -214,8 +229,8 @@ ARGUMENTS
         -lp {Right,Max,Start,End}, --labelPosition {Right,Max,Start,End}
             choose position of clade labels (default: Right)
 
-Only make abundance and hiearchy files
---------------------------------------
+epimuller-define: make abundance and hiearchy files
+---------------------------------------------------
 
 ::
 
@@ -262,8 +277,8 @@ Only make abundance and hiearchy files
             end date in iso format YYYY-MM-DD or 'lastDate' which
             is in metadata (default: lastDate)
 
-Only plot
----------
+epimuller-draw: plot
+--------------------
 
 ::
 
@@ -329,15 +344,6 @@ Download source code from
 
     python3 setup.py install
 
-With Bioconda
-~~~~~~~~~~~~~
-
-Does not work at time of writing
-
-::
-
-    #conda install -c bioconda epimuller
-
 Run scripts directly
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -366,6 +372,15 @@ Download source code from
 
     #to run epimuller-draw 
     python3 ./scripts/drawMuller.py  [arugments]
+
+With Bioconda
+~~~~~~~~~~~~~
+
+Does not work at time of writing
+
+::
+
+    #conda install -c bioconda epimuller
 
 Citation
 --------
