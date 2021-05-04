@@ -79,7 +79,7 @@ Examples for full run
 
 To see steps used to prep files for these examples look at
 scripts/Example\_CommandsFromScratch.txt on
-`gitHub <https://github.com/jennifer-bio/epimuller>`__.
+`gitHub <https://github.com/jennifer-bio/epimuller/blob/main/scripts/Example_CommandsFromScratch.txt>`__.
 
 Visulize default aa mutation list
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -130,7 +130,7 @@ Known edge cases / featrues to add
 Known edge cases which are not correctly dealt with or features I intend
 to address (eventually). If you run into anything else please let me
 know with an issue on
-`gitHub <https://github.com/jennifer-bio/epimuller>`__.
+`gitHub <https://github.com/jennifer-bio/epimuller/issues>`__.
 
 ::
 
