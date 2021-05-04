@@ -18,10 +18,10 @@ Aligned viral genomes, collection dates, PANGO lineages, Nextstain JSON file, an
 
 ###### Workflow overview
 
-- epimuller-parse (optional): parse fasta names with '*bar* isodate' suffix into usable fasta and metadata files.
-- epimuller: wrapper for epimuller-define and epimuller-draw.
-	 - epimuller-define: assigns samples to clades based on ancestral reconstruction of specified aa mutations or trait (hierarchy), and counts samples withen each time frame (abundance).
-	 - epimuller-draw: plots the frequency clades overtime, as specifed by abundance and hierarchy inputs from epimuller-define.
+- **epimuller-parse** (optional): parse fasta names with '*bar* isodate' suffix into usable fasta and metadata files.
+- **epimuller**: wrapper for epimuller-define and epimuller-draw.
+	 - **epimuller-define**: assigns samples to clades based on ancestral reconstruction of specified aa mutations or trait (hierarchy), and counts number of samples in a clade withen each time frame (abundance).
+	 - **epimuller-draw**: plots the frequency clades overtime, as specifed by abundance and hierarchy inputs from epimuller-define.
 
 ###### Source code avaliblity
 [gitHub](https://github.com/jennifer-bio/epimuller)
@@ -121,6 +121,16 @@ If you have downloaded sequences from GISAID under the search tab, you can parse
 ## epimuller arguments  
 
 ```
+epimuller [-h] [-oDir OUTDIRECTORY] -oP OUTPREFIX -n
+	 INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
+	 [-f TRAITOFINTERSTFILE]
+	 [-k TRAITOFINTERSTKEY]
+	 [-aa AAVOCLIST [AAVOCLIST ...]]
+	 [-t TIMEWINDOW] [-s STARTDATE] [-e ENDDATE]
+	 [-mt MINTIME] [-min MINTOTALCOUNT]
+	 [-c CASES_NAME] [-l {date,time}]
+	 [-lp {Right,Max,Start,End}]
+
 optional arguments:
 	-h, --help            show this help message and exit
 
@@ -187,7 +197,7 @@ Options passed to epimuller-draw:
 ## epimuller-define: make abundance and hiearchy files 
 
 ```
-usage: epimuller-define [-h] -n INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
+epimuller-define [-h] -n INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
 	 [-f TRAITOFINTERSTFILE] [-k TRAITOFINTERSTKEY]
 	 [-aa AAVOCLIST [AAVOCLIST ...]]
 	 [-oDir OUTDIRECTORY] -oP OUTPREFIX
@@ -235,7 +245,7 @@ optional arguments:
 ## epimuller-draw: plot
 
 ```
-usage: epimuller-draw [-h] -p PARENTHIERARCHY_NAME -a ABUNDANCE_NAME
+epimuller-draw [-h] -p PARENTHIERARCHY_NAME -a ABUNDANCE_NAME
 	 [-c CASES_NAME] -o OUTFOLDER [-mt MINTIME]
 	 [-min MINTOTALCOUNT] [-l {date,time}]
 	 [-lp {Right,Max,Start,End}]
