@@ -34,15 +34,16 @@ file, and timetree
 Workflow overview
 ~~~~~~~~~~~~~~~~~
 
--  epimuller-parse (optional): parse fasta names with '*bar* isodate'
-   suffix into usable fasta and metadata files.
--  epimuller: wrapper for epimuller-define and epimuller-draw.
+-  **epimuller-parse** (optional): parse fasta names with '*bar*
+   isodate' suffix into usable fasta and metadata files.
+-  **epimuller**: wrapper for epimuller-define and epimuller-draw.
 
-   -  epimuller-define: assigns samples to clades based on ancestral
+   -  **epimuller-define**: assigns samples to clades based on ancestral
       reconstruction of specified aa mutations or trait (hierarchy), and
-      counts samples withen each time frame (abundance).
-   -  epimuller-draw: plots the frequency clades overtime, as specifed
-      by abundance and hierarchy inputs from epimuller-define.
+      counts number of samples in a clade withen each time frame
+      (abundance).
+   -  **epimuller-draw**: plots the frequency clades overtime, as
+      specifed by abundance and hierarchy inputs from epimuller-define.
 
 Source code avaliblity
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -139,6 +140,8 @@ know with an issue on
         - feel free to ignore the undefined.svg that gets made - it is related to checking the size of the text to space out labels
         - add plot and font size to arg options
         - make avalible with bioconda
+        - make PANGO lineage optional
+        - define by combination of aa mutants/not just 1
 
 Addtional features
 ------------------
@@ -169,6 +172,16 @@ epimuller arguments
 -------------------
 
 ::
+
+    epimuller [-h] [-oDir OUTDIRECTORY] -oP OUTPREFIX -n
+         INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
+         [-f TRAITOFINTERSTFILE]
+         [-k TRAITOFINTERSTKEY]
+         [-aa AAVOCLIST [AAVOCLIST ...]]
+         [-t TIMEWINDOW] [-s STARTDATE] [-e ENDDATE]
+         [-mt MINTIME] [-min MINTOTALCOUNT]
+         [-c CASES_NAME] [-l {date,time}]
+         [-lp {Right,Max,Start,End}]
 
     optional arguments:
         -h, --help            show this help message and exit
@@ -234,7 +247,7 @@ epimuller-define: make abundance and hiearchy files
 
 ::
 
-    usage: epimuller-define [-h] -n INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
+    epimuller-define [-h] -n INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
          [-f TRAITOFINTERSTFILE] [-k TRAITOFINTERSTKEY]
          [-aa AAVOCLIST [AAVOCLIST ...]]
          [-oDir OUTDIRECTORY] -oP OUTPREFIX
@@ -282,7 +295,7 @@ epimuller-draw: plot
 
 ::
 
-    usage: epimuller-draw [-h] -p PARENTHIERARCHY_NAME -a ABUNDANCE_NAME
+    epimuller-draw [-h] -p PARENTHIERARCHY_NAME -a ABUNDANCE_NAME
          [-c CASES_NAME] -o OUTFOLDER [-mt MINTIME]
          [-min MINTOTALCOUNT] [-l {date,time}]
          [-lp {Right,Max,Start,End}]

@@ -102,6 +102,8 @@ If you run into anything else please let me know with an issue on [gitHub](https
 	- feel free to ignore the undefined.svg that gets made - it is related to checking the size of the text to space out labels
 	- add plot and font size to arg options
 	- make avalible with bioconda
+	- make PANGO lineage optional
+	- define by combination of aa mutants/not just 1
 ```
 
 ## Addtional features

@@ -157,14 +157,15 @@ def drawWrapper(outFolder, outPrefix, root_clades_l, scaleTime, times_l, maxY, m
 	bottomPlot = HEIGHT-MARGIN
 	totalHeight = bottomPlot-topPlot
 	wirteEvery = int(maxY/10)
-	tWidth = textwidth(str(int(maxY)), FONTSIZE)
+	maxLabel = str(int(maxY))+ " "
+	tWidth = textwidth(maxLabel, FONTSIZE)
 	fontsize = FONTSIZE 
 	while tWidth > MARGIN:
 		fontsize = fontsize - 1 
-		tWidth = textwidth(str(int(maxY)), fontsize)
+		tWidth = textwidth(maxLabel, fontsize)
+	xpos = MARGIN - tWidth 
 	for i in range(int(maxY)):
 		if i % wirteEvery == 0:
-			xpos = 0
 			ypos = MARGIN + (maxY - i)*totalHeight/maxY
 			img.add(img.text(text = str(i), insert = (xpos,  ypos), font_size=fontsize))
 
