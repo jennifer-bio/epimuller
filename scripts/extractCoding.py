@@ -72,18 +72,18 @@ for l in open(annotation_path).readlines():
             codon = seq[i*3:i*3+3].upper()
             if codon == 'TGA' or codon == 'TAA' or codon == 'TAG' or hadStop:
                 hadStop = True
-                seq_noStop += 'NNN'
-                aaSeq_noStop += "N"
+                seq_noStop += '---'
+                aaSeq_noStop += "-"
             else:
 
                 seq_noStop += codon
                 if "N" in codon:
-                    aa = "N"
+                    aa = "-"
                 elif "-" in codon:
                     aa = "-"
                 else:
                     if codon not in gencode:
-                        aa = "N"
+                        aa = "-"
                     else:
                         aa = gencode[codon]
                 aaSeq_noStop += aa
