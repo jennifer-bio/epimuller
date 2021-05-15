@@ -101,9 +101,8 @@ If you run into anything else please let me know with an issue on [gitHub](https
 	- only takes nextstrain json files - intending to set up to take treetime output
 	- feel free to ignore the undefined.svg that gets made - it is related to checking the size of the text to space out labels
 	- add plot and font size to arg options
-	- make avalible with bioconda
-	- make PANGO lineage optional
 	- define by combination of aa mutants/not just 1
+	- deal with polytomies
 ```
 
 ## Addtional features
@@ -282,6 +281,12 @@ optional arguments:
 
 ## Install methods
 
+##### With Bioconda
+
+```
+conda install -c bioconda epimuller
+```
+
 ##### With pip
 
 ```
@@ -331,12 +336,6 @@ python3 ./scripts/drawMuller.py  [arugments]
 
 ```
 
-##### With Bioconda
-
-Does not work at time of writing
-```
-#conda install -c bioconda epimuller
-```
 
 ## Citation
 

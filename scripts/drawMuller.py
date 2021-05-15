@@ -9,13 +9,12 @@ import cairo
 import cairosvg
 
 
-WIDTH = 1500
-HEIGHT = 1000
-#LEGENDWIDTH_GLOBAL = 220
-LEGENDWIDTH = 220
-MARGIN = 60
-LABELSHIFT = 15
-FONTSIZE = 26
+# WIDTH = 1500
+# HEIGHT = 1000
+# LEGENDWIDTH = 220
+# MARGIN = 60
+# LABELSHIFT = 15
+# FONTSIZE = 26
 
 class Clade:
 	def __init__(self, name, parent_name):
@@ -373,27 +372,45 @@ def main():
 	parser.add_argument('-l', '--xlabel', required=False, type=str, choices = ["date", "time"], default="date", help="Format of x axis label: ISO date format or timepoints from start")
 	parser.add_argument('-lp', '--labelPosition', required=False, type=str, default="Right", choices = ["Right", "Max", "Start", "End"], help="choose position of clade labels")
 
+	#parser.add_argument("--tmrca", action="store_true", help="draw point at tmrca of clade if flag is used")
+
+
+	drawing_group_page  = parser.add_argument_group('Options for page setup')
+
+	drawing_group_page.add_argument('--WIDTH', required=False, type=str, default="1500", help="WIDTH of page (px)")
+	drawing_group_page.add_argument('--HEIGHT', required=False, type=str, default="1000", help="HEIGHT of page (px)")
+	drawing_group_page.add_argument('--LEGENDWIDTH', required=False, type=str, default="220", help="LEGENDWIDTH to the right of plotting area (px)")
+	drawing_group_page.add_argument('--MARGIN', required=False, type=str, default="60", help="MARGIN around all sides of plotting area (px)")
+	drawing_group_page.add_argument('--FONTSIZE', required=False, type=str, default="26")
+	
+
 	args = parser.parse_args()
 
 
-########################## names
+########################## set up global
 
-	abundances_file = open(args.abundance_name, "r")
-
-	hierarchy_file = open(args.parentHierarchy_name, "r")	
-
-	#color_file = open(args.color_list, "r")
 
 	if not os.path.exists(args.outFolder):
 		os.makedirs(args.outFolder)
 
-	# if args.labelPosition != "Right":
-	# 	LEGENDWIDTH = 0
-	# else:
-	# 	LEGENDWIDTH = LEGENDWIDTH_GLOBAL
+	global WIDTH
+	WIDTH = args.WIDTH
+	global HEIGHT
+	HEIGHT = args.HEIGHT
+	global LEGENDWIDTH
+	LEGENDWIDTH = args.LEGENDWIDTH
+	global MARGIN
+	MARGIN = args.MARGIN
+	global FONTSIZE
+	FONTSIZE = args.FONTSIZE
 
+	if args.labelPosition != "Right":
+		LEGENDWIDTH = 0
+	
 
 ########################## read in files
+
+	abundances_file = open(args.abundance_name, "r")
 
 	abundances_d = {}
 	#abundance_total_d {}
@@ -424,6 +441,9 @@ def main():
 
 	abundances_file.close()	
 
+
+	hierarchy_file = open(args.parentHierarchy_name, "r")	
+
 	childParent_d = {}
 	cladeColor_d = {}
 	hasHeader = False
@@ -452,12 +472,6 @@ def main():
 
 	abundances_d, heiarchy_d = removeSmallClades(abundances_d, childParent_d, args.MINTOTALCOUNT)
 
-	# color_list = []
-	# for line in color_file:
-	# 	col = line.strip()
-	# 	if len(col) == 7:
-	# 		color_list.append(col)
-	# color_file.close()
 
 ########################## parse clades
 	times_l = abundances_d.keys()
@@ -468,7 +482,6 @@ def main():
 	for clade in childParent_d:
 		clade = Clade(clade, childParent_d[clade])
 		setattr(clade, "color", cladeColor_d[clade.name])
-		#setattr(clade, "color", random.choice(color_list))
 		#TODO make this determatistic for most diverse colors and add in more color options
 		clades_l.append(clade)
 		if clade.parent_name == "NA":
@@ -528,10 +541,8 @@ def main():
 
 		numSections = len(root_clades_l) + 1
 		parentEdgeHeight = scaleFactor*(snap.sumAll - descendantSpace)/numSections
-		#parentEdgeHeight = scaleFactor*(snap.sumAll)/numSections
 		acountedHeight = topPlot
 
-		#print(root_clades_l)
 
 		for clade in root_clades_l:
 			cladeSnap = clade.cladeSnapshot_time_d[snap.time]
@@ -566,7 +577,7 @@ def main():
 		lessThanMax_ratio = snap.sumAll/maxCount
 		totalHeight = (bottomPlot-topPlot)*lessThanMax_ratio
 		
-		scaleFactor = totalHeight/snap.sumAll #(maxCount - lessThanMax) #totalHeight/snap.sumAll
+		scaleFactor = totalHeight/snap.sumAll 
 
 		descendantSpace = 0
 		for clade in root_clades_l:
@@ -574,13 +585,9 @@ def main():
 
 		numSections = len(root_clades_l) + 1
 		parentEdgeHeight = scaleFactor*(snap.sumAll - descendantSpace)/numSections
-		#parentEdgeHeight = scaleFactor*(snap.sumAll)/numSections
 		acountedHeight = topPlot + scaleFactor*lessThanMax
 
 		for clade in root_clades_l:
-
-
-			# should be good
 
 			cladeSnap = clade.cladeSnapshot_time_d[snap.time]
 			y1 = acountedHeight + parentEdgeHeight
@@ -613,12 +620,10 @@ def main():
 				if "confirmed_rolling" in line_l and "date" in line_l:
 					date_index = line_l.index("date")
 					case_index = line_l.index("confirmed_rolling")
-					#print(line_l, line_l[date_index], line_l[case_index])
 				else:
 					print("file with cases - formated with 'date' in ISO format and 'confirmed_rolling' cases, in tsv format")
 					sys.exit(1)
 			else:
-				#print(line_l, case_index, date_index , line_l[date_index], line_l[case_index])
 				dateToCase_d[line_l[date_index].replace('"', "")] = float(line_l[case_index].replace('"', ""))
 
 
@@ -640,7 +645,7 @@ def main():
 			totalHeight = (bottomPlot-topPlot)*lessThanMax_ratio
 
 			
-			scaleFactor = totalHeight/snap.sumAll #(maxCount - lessThanMax) #totalHeight/snap.sumAll
+			scaleFactor = totalHeight/snap.sumAll 
 
 
 			descendantSpace = 0

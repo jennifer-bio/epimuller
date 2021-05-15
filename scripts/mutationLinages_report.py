@@ -66,6 +66,13 @@ def main():
 	drawing_group.add_argument('-l', '--xlabel', required=False, type=str, choices = ["date", "time"], default="date", help="Format of x axis label: ISO date format or timepoints from start")
 	drawing_group.add_argument('-lp', '--labelPosition', required=False, type=str, default="Right", choices = ["Right", "Max", "Start", "End"], help="choose position of clade labels")
 
+	drawing_group_page  = parser.add_argument_group('Options passed to epimuller-draw for page setup')
+	drawing_group_page.add_argument('--WIDTH', required=False, type=str, default="1500", help="WIDTH of page (px)")
+	drawing_group_page.add_argument('--HEIGHT', required=False, type=str, default="1000", help="HEIGHT of page (px)")
+	drawing_group_page.add_argument('--LEGENDWIDTH', required=False, type=str, default="220", help="LEGENDWIDTH to the right of plotting area (px)")
+	drawing_group_page.add_argument('--MARGIN', required=False, type=str, default="60", help="MARGIN around all sides of plotting area (px)")
+	drawing_group_page.add_argument('--FONTSIZE', required=False, type=str, default="26")
+	
 
 
 	args = parser.parse_args()
@@ -108,7 +115,8 @@ def main():
 	# 	args.MINTOTALCOUNT, "--xlabel", args.xlabel , "--labelPosition", args.labelPosition])
 	oscommand = " ".join(["epimuller-draw --parentHierarchy_name", outCladeHierarchy_name, "--abundance_name", outCounts_name, "--outFolder", plot_folder,
 		"--xlabel", args.xlabel, "--labelPosition", args.labelPosition, "--MINTIME", args.MINTIME, "--MINTOTALCOUNT", 
-		args.MINTOTALCOUNT, "--xlabel", args.xlabel , "--labelPosition", args.labelPosition])
+		args.MINTOTALCOUNT, "--xlabel", args.xlabel , "--labelPosition", args.labelPosition, 
+		"--WIDTH", args.WIDTH, "--HEIGHT", args.HEIGHT, "--LEGENDWIDTH", args.LEGENDWIDTH, "--MARGIN", args.MARGIN , "--FONTSIZE", args.FONTSIZE])
 
 	if args.cases_name is not None:
 		oscommand = oscommand + " --cases_name " + args.cases_name
@@ -116,8 +124,7 @@ def main():
 	print("\n ### Call command ###")
 	print(oscommand)
 	os.system(oscommand)
-
-
+	
 
 
 if __name__ == "__main__":
