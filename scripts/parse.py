@@ -149,28 +149,30 @@ def buildTree(treeString, treeformat, openParen_d, closeParn_d, commaParn_d, sub
 			currentNodeName = currentNodeName.split("{")[0]
 
 		elif treeformat_d["annotationType"] == "treetimeAnnot":
-			annotation_str = currentNodeLen.split("[")[1].replace("&", "")
-			annotKey = ""
-			annotValue = ""
-			addToKey = True
-			outOfQuote = True
-			annotation_d = {}
-			for c in annotation_str:
-				if c == '"':
-					outOfQuote = not outOfQuote
+			if "[" in currentNodeLen: #note: no annotation assigned to root 
+				annotation_str = currentNodeLen.split("[")[1].replace("&", "")
+				annotKey = ""
+				annotValue = ""
+				addToKey = True
+				outOfQuote = True
+				annotation_d = {}
+				for c in annotation_str:
+					if c == '"':
+						outOfQuote = not outOfQuote
 
-				if c == "=":
-					addToKey = False
-				elif (c == "," and outOfQuote) or c == "]":
-					addToKey = True
-					setattr(currentNode, annotKey, annotValue)
-					currentNode.annotKeys.append(annotKey)
-					annotKey = ""
-					annotValue = ""
-				elif addToKey:
-					annotKey += c
-				else:
-					annotValue += c
+					if c == "=":
+						addToKey = False
+					elif (c == "," and outOfQuote) or c == "]":
+						addToKey = True
+						setattr(currentNode, annotKey, annotValue.replace('"', ''))
+						currentNode.annotKeys.append(annotKey)
+						annotKey = ""
+						annotValue = ""
+					elif addToKey:
+						annotKey += c
+					else:
+						annotValue += c
+
 
 			currentNodeLen = currentNodeLen.split("[")[0]
 
@@ -233,7 +235,7 @@ def makeNewickString(node, treeformat_d):
 			treeString += label + ","
 		treeString = treeString[:-1] + "}"
 
-	if hasBranchLen:
+	if treeformat_d["branchLen"]:
 		treeString += ":" + str(node.length)
 		if treeformat_d["annotationType"] == "hyphyAnnot":
 			treeString += "[&"
@@ -253,13 +255,13 @@ def writeNewick(tree, filename, treeformat):
 	'''
 
 	treeformat_d = parseFormat(treeformat)
-	treeString = makeNewickString(tree.root, treeformat_d)
+	treeString = makeNewickString(tree.root, treeformat_d) + ";"
 
 	directory = os.path.dirname(filename)
 	if not os.path.exists(directory):
 		os.makedirs(directory)
 
-	file_open = open(file, "w")
+	file_open = open(filename, "w")
 	file_open.write(treeString)
 	file_open.close()
 

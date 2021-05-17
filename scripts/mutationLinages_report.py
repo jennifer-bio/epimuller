@@ -39,7 +39,12 @@ def main():
 
 	defClades_group  = parser.add_argument_group('Options passed to epimuller-define')
 
-	defClades_group.add_argument('-n', '--inNextstrain', required=True, type=str, help="nextstrain results with tree.nwk and [traitOfInterst].json")
+
+	treeAndtraits = parser.add_mutually_exclusive_group(required=True)
+	treeAndtraits.add_argument('-n', '--inNextstrain', type=str, help="nextstrain results with tree.nwk and [traitOfInterst].json")
+	treeAndtraits.add_argument('-a', '--annotatedTree', type=str, help="nexus file name  and [traitOfInterst].json")
+
+	#defClades_group.add_argument('-n', '--inNextstrain', required=True, type=str, help="nextstrain results with tree.nwk and [traitOfInterst].json")
 	defClades_group.add_argument('-m', '--inMeta', required=True, type=str, help="metadata tsv with 'strain'	and 'date'cols, optional: cols of trait of interst; and pangolin col named: 'lineage' or 'pangolin_lin'")
 	defClades_group.add_argument('-p', '--inPangolin', required=False, type=str, default = "metadata", help="pangolin output lineage_report.csv file, if argument not supplied looks in inMeta for col with 'pangolin_lin' or 'lineage'")
 
@@ -59,7 +64,7 @@ def main():
 	drawing_group  = parser.add_argument_group('Options passed to epimuller-draw')
 
 	drawing_group.add_argument('-mt', '--MINTIME', required=False, type=str, default="30", help="minimum time point to start plotting")
-	drawing_group.add_argument('-min', '--MINTOTALCOUNT', required=False, type=str, default="10", help="minimum total count for group to be included")
+	drawing_group.add_argument('-min', '--MINTOTALCOUNT', required=False, type=str, default="50", help="minimum total count for group to be included")
 
 	drawing_group.add_argument('-c', '--cases_name', required=False, type=str, help="file with cases - formated with 'date' in ISO format and 'confirmed_rolling' cases, in tsv format")
 
@@ -72,24 +77,38 @@ def main():
 	drawing_group_page.add_argument('--LEGENDWIDTH', required=False, type=str, default="220", help="LEGENDWIDTH to the right of plotting area (px)")
 	drawing_group_page.add_argument('--MARGIN', required=False, type=str, default="60", help="MARGIN around all sides of plotting area (px)")
 	drawing_group_page.add_argument('--FONTSIZE', required=False, type=str, default="26")
+	drawing_group_page.add_argument('--LABELSHIFT', required=False, type=str, default="15", help="nudge label over by LABELSHIFT (px)")
 	
 
 
 	args = parser.parse_args()
 
 
+	#call with script
+	# commandCallDefine = "python ../../epiMuller/scripts/defineAndCountClades.py"
+	# commandCallDraw = "python ../../epiMuller/scripts/drawMuller.py"
+
+
+	#call with entry_points
+
+	commandCallDefine = "epimuller-define"
+	commandCallDraw = "epimuller-draw"
+
+
 	########################### call defineAndCountClades.py
 
+	if args.inNextstrain is not None:
+		treeAndtraits = "--inNextstrain " + args.inNextstrain
+	else:
+		treeAndtraits = "--annotatedTree " + args.annotatedTree
 
 
-	# oscommand = " ".join(["python 00_scripts/defineAndCountClades.py --outDirectory", args.outDirectory , "--outPrefix", args.outPrefix ,
-	#  "--inNextstrain", args.inNextstrain , "--inMeta", args.inMeta , "--inPangolin", args.inPangolin , 
-	#  "--traitOfInterstFile", args.traitOfInterstFile , "--traitOfInterstKey", args.traitOfInterstKey , "--timeWindow", args.timeWindow ,
-	#  "--startDate", args.startDate ,"--endDate", args.endDate])
-	oscommand = " ".join(["epimuller-define --outDirectory", args.outDirectory , "--outPrefix", args.outPrefix ,
-	 "--inNextstrain", args.inNextstrain , "--inMeta", args.inMeta , "--inPangolin", args.inPangolin , 
+	oscommand = " ".join([commandCallDefine, "--outDirectory", args.outDirectory , "--outPrefix", args.outPrefix ,
+	 treeAndtraits , "--inMeta", args.inMeta , "--inPangolin", args.inPangolin , 
 	 "--traitOfInterstFile", args.traitOfInterstFile , "--traitOfInterstKey", args.traitOfInterstKey , "--timeWindow", args.timeWindow ,
 	 "--startDate", args.startDate ,"--endDate", args.endDate])
+
+
 	if args.aaVOClist is not None:
 		oscommand = oscommand + " --aaVOClist"
 		for aa in args.aaVOClist:
@@ -113,17 +132,18 @@ def main():
 	# oscommand = " ".join(["python 00_scripts/drawMuller.py --parentHierarchy_name", outCladeHierarchy_name, "--abundance_name", outCounts_name, "--outFolder", plot_folder,
 	# 	"--xlabel", args.xlabel, "--labelPosition", args.labelPosition, "--MINTIME", args.MINTIME, "--MINTOTALCOUNT", 
 	# 	args.MINTOTALCOUNT, "--xlabel", args.xlabel , "--labelPosition", args.labelPosition])
-	oscommand = " ".join(["epimuller-draw --parentHierarchy_name", outCladeHierarchy_name, "--abundance_name", outCounts_name, "--outFolder", plot_folder,
+	oscommand = " ".join([commandCallDraw, "--parentHierarchy_name", outCladeHierarchy_name, "--abundance_name", outCounts_name, "--outFolder", plot_folder,
 		"--xlabel", args.xlabel, "--labelPosition", args.labelPosition, "--MINTIME", args.MINTIME, "--MINTOTALCOUNT", 
 		args.MINTOTALCOUNT, "--xlabel", args.xlabel , "--labelPosition", args.labelPosition, 
-		"--WIDTH", args.WIDTH, "--HEIGHT", args.HEIGHT, "--LEGENDWIDTH", args.LEGENDWIDTH, "--MARGIN", args.MARGIN , "--FONTSIZE", args.FONTSIZE])
+		"--WIDTH", args.WIDTH, "--HEIGHT", args.HEIGHT, "--LEGENDWIDTH", args.LEGENDWIDTH, "--MARGIN", args.MARGIN , "--FONTSIZE", args.FONTSIZE, "--LABELSHIFT", args.LABELSHIFT])
 
 	if args.cases_name is not None:
 		oscommand = oscommand + " --cases_name " + args.cases_name
 	
 	print("\n ### Call command ###")
 	print(oscommand)
-	os.system(oscommand)
+	if os.system(oscommand) != 0:
+		sys.exit("epimuller-draw failed")
 	
 
 

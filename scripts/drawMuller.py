@@ -162,11 +162,13 @@ def drawWrapper(outFolder, outPrefix, root_clades_l, scaleTime, times_l, maxY, m
 	while tWidth > MARGIN:
 		fontsize = fontsize - 1 
 		tWidth = textwidth(maxLabel, fontsize)
-	xpos = MARGIN - tWidth 
 	for i in range(int(maxY)):
 		if i % wirteEvery == 0:
+			xpos = MARGIN - (textwidth(str(i), fontsize) + LABELSHIFT)
 			ypos = MARGIN + (maxY - i)*totalHeight/maxY
-			img.add(img.text(text = str(i), insert = (xpos,  ypos), font_size=fontsize))
+			img.add(img.text(text = str(i), insert = (xpos,  ypos + (textheight(str(i), FONTSIZE))/2), font_size=fontsize))
+			img.add(img.line(start = (MARGIN-LABELSHIFT,  ypos), end = (MARGIN+LABELSHIFT,  ypos), stroke_width=5, stroke = "black"))
+
 
 
 
@@ -194,7 +196,7 @@ def drawWrapper(outFolder, outPrefix, root_clades_l, scaleTime, times_l, maxY, m
 		fontsize = fontsize - 1 
 		tHeight = textwidth(outPrefix, fontsize)
 
-	img.add(img.text(text = outPrefix, insert = (MARGIN + LABELSHIFT, MARGIN/2), font_size=fontsize))
+	img.add(img.text(text = outPrefix.replace("_", " "), insert = (MARGIN + LABELSHIFT, MARGIN/2), font_size=fontsize))
 
 	img.save()
 
@@ -367,7 +369,7 @@ def main():
 
 
 	parser.add_argument('-mt', '--MINTIME', required=False, type=str, default="30", help="minimum time point to start plotting")
-	parser.add_argument('-min', '--MINTOTALCOUNT', required=False, type=str, default="10", help="minimum total count for group to be included")
+	parser.add_argument('-min', '--MINTOTALCOUNT', required=False, type=str, default="50", help="minimum total count for group to be included")
 
 	parser.add_argument('-l', '--xlabel', required=False, type=str, choices = ["date", "time"], default="date", help="Format of x axis label: ISO date format or timepoints from start")
 	parser.add_argument('-lp', '--labelPosition', required=False, type=str, default="Right", choices = ["Right", "Max", "Start", "End"], help="choose position of clade labels")
@@ -380,6 +382,7 @@ def main():
 	drawing_group_page.add_argument('--WIDTH', required=False, type=str, default="1500", help="WIDTH of page (px)")
 	drawing_group_page.add_argument('--HEIGHT', required=False, type=str, default="1000", help="HEIGHT of page (px)")
 	drawing_group_page.add_argument('--LEGENDWIDTH', required=False, type=str, default="220", help="LEGENDWIDTH to the right of plotting area (px)")
+	drawing_group_page.add_argument('--LABELSHIFT', required=False, type=str, default="15", help="nudge label over by LABELSHIFT (px)")
 	drawing_group_page.add_argument('--MARGIN', required=False, type=str, default="60", help="MARGIN around all sides of plotting area (px)")
 	drawing_group_page.add_argument('--FONTSIZE', required=False, type=str, default="26")
 	
@@ -394,15 +397,17 @@ def main():
 		os.makedirs(args.outFolder)
 
 	global WIDTH
-	WIDTH = args.WIDTH
+	WIDTH = float(args.WIDTH)
 	global HEIGHT
-	HEIGHT = args.HEIGHT
+	HEIGHT = float(args.HEIGHT)
 	global LEGENDWIDTH
-	LEGENDWIDTH = args.LEGENDWIDTH
+	LEGENDWIDTH = float(args.LEGENDWIDTH)
 	global MARGIN
-	MARGIN = args.MARGIN
+	MARGIN = float(args.MARGIN)
 	global FONTSIZE
-	FONTSIZE = args.FONTSIZE
+	FONTSIZE = float(args.FONTSIZE)
+	global LABELSHIFT
+	LABELSHIFT = float(args.LABELSHIFT)
 
 	if args.labelPosition != "Right":
 		LEGENDWIDTH = 0

@@ -111,13 +111,16 @@ def annotateNwk_nextstrain(t, j_d, trait, indexToGene, geneToIndex, sampDate_d, 
 def treetimeToTraits_d(parseT, traitOfInterstKey):
 	nodeTraits_d = {}
 	for node in parse.traverse_depthFirst(parseT.root):
-		nodeTraits_d[node.name] = node.traitOfInterstKey
-
+		temp = getattr(node, traitOfInterstKey, None)
+		if temp is not None:
+			nodeTraits_d[node.name] = temp
+		else:
+			nodeTraits_d[node.name] = "NA"
+		 	#print("does not have trait", node.__dict__)
 	return nodeTraits_d
 
 
-def annotateNwk_treetime(t, nodeTraits_d, indexToGene, geneToIndex, sampDate_d, sampPangolin_d):
-
+def annotateNwk_treetime(t, nodeTraits_d, trait, indexToGene, geneToIndex, sampDate_d, sampPangolin_d):
 	for node in t.traverse("preorder"):
 		if "NODE_" not in node.name:
 			if node.name in sampPangolin_d:
@@ -455,7 +458,7 @@ def main():
 
 	sampDate_d, sampPangolin_d, firstDate, lastDate = readInMeta(args.inMeta, args.inPangolin)
 
-	if args.inNextstrain is not none:
+	if args.inNextstrain is not None:
 		#use nextstrain as input
 
 		inJSON_name = os.path.join(args.inNextstrain, args.traitOfInterstFile)
@@ -472,13 +475,15 @@ def main():
 	else: #use treetime ancestral as input
 		parseT = parse.treeImport_wrap(args.annotatedTree, ["nexus", "treetimeAnnot"])
 
-		nodeTraits_d = treetimeToTraits_d(parseT, args.args.traitOfInterstKey)
+		nodeTraits_d = treetimeToTraits_d(parseT, args.traitOfInterstKey)
+
+		print(tempTree_name)
 
 		parse.writeNewick(parseT, tempTree_name, []) #write to file that can be read by ete3
 		t = Tree(tempTree_name, format = 3)
 
 
-		t = annotateNwk_treetime(t, nodeTraits_d, indexToGene, geneToIndex, sampDate_d, sampPangolin_d)
+		t = annotateNwk_treetime(t, nodeTraits_d,args.traitOfInterstKey, indexToGene, geneToIndex, sampDate_d, sampPangolin_d)
 
 
 	######################### make clades assignments (assignment_d: key: leaf node name; value: clade) and heierarchy (heiarchy_d: key:child clade; value:parent clade )
