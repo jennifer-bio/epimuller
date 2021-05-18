@@ -36,12 +36,16 @@ def readInMeta(inMeta_name, pangolin):
 			sampDate_d[tipName] = tipDate 
 
 			if tipDate != "":
-				isoDate = date.fromisoformat(tipDate)
+				try:
+					isoDate = date.fromisoformat(tipDate)
 
-				if isoDate < firstDate:
-					firstDate = isoDate
-				if isoDate > lastDate:
-					lastDate = isoDate
+					if isoDate < firstDate:
+						firstDate = isoDate
+					if isoDate > lastDate:
+						lastDate = isoDate
+
+				except ValueError:
+					pass
 
 			if pangolin == 'metadata' and pangolin_index != "NA":
 				sampPangolin = line_l[pangolin_index]
@@ -62,8 +66,13 @@ def readInMeta(inMeta_name, pangolin):
 		if pangolin == 'metadata' and pangolin_index == "NA":
 			if "pangolin_lin" in line_l:
 				pangolin_index = line_l.index("pangolin_lin")
-			if "lineage" in line_l:
+			elif "pangolin_lineage" in line_l:
+				pangolin_index = line_l.index("pangolin_lineage")
+			elif "lineage" in line_l:
 				pangolin_index = line_l.index("lineage")
+			else:
+				print("pangolin not found in metadata, col must be called 'pangolin_lin', 'pangolin_lineage', or 'lineage' ")
+
 	
 	if pangolin != 'metadata': # pangolin output lineage report file name
 		inPangolin_open = open(pangolin, "r")
@@ -101,6 +110,9 @@ def annotateNwk_nextstrain(t, j_d, trait, indexToGene, geneToIndex, sampDate_d, 
 						usable = mut.replace(".", "J").replace("-", "X").replace("*", "J") #gaps represented by X
 						temp += usable+"."
 				temp += "-"
+		elif trait == "muts":
+			for mut in j_d['nodes'][node.name][trait]:
+				temp += mut + "."
 		else:
 			temp += str(j_d['nodes'][node.name][trait])
 			#node_annot = temp
@@ -120,7 +132,7 @@ def treetimeToTraits_d(parseT, traitOfInterstKey):
 	return nodeTraits_d
 
 
-def annotateNwk_treetime(t, nodeTraits_d, trait, indexToGene, geneToIndex, sampDate_d, sampPangolin_d):
+def annotateNwk_treetime(t, nodeTraits_d, trait, geneBoundry_d, indexToGene, geneToIndex, sampDate_d, sampPangolin_d):
 	for node in t.traverse("preorder"):
 		if "NODE_" not in node.name:
 			if node.name in sampPangolin_d:
@@ -132,27 +144,23 @@ def annotateNwk_treetime(t, nodeTraits_d, trait, indexToGene, geneToIndex, sampD
 			temp = "_"
 
 		if trait == "aa_muts":
+			mutList = str(nodeTraits_d[node.name])
+			
+			for index in range(12):
+				refGene = indexToGene[index]
+				for mutRaw in mutList.split(","):
+					rawPos = int(mutRaw[1:-1])
+					if rawPos >= geneBoundry_d[refGene][0] and rawPos < geneBoundry_d[refGene][1]:
+						mutRaw.replace(".", "J").replace("-", "X").replace("*", "J")
+						temp += mutRaw[0] + str(rawPos - geneBoundry_d[refGene]) + mutRaw[-1] + "."
+				temp += "-"
 			temp += str(nodeTraits_d[node.name])
 			#todo loop through and assign postion in appened aa to genes using renameAln_codingRegions_geneAAboundries.json
 		elif trait == "mutations":
-			#pass
-			temp += str(nodeTraits_d[node.name])
+			for mut in nodeTraits_d[node.name].split(","):
+				temp += mut + "."
 		else:
 			temp += str(nodeTraits_d[node.name])
-
-
-
-		# if trait == "aa_muts":
-		# 	#for gene in geneToIndex:
-		# 	for index in range(12):
-		# 		gene = indexToGene[index]
-		# 		if gene in j_d['nodes'][node.name][trait]:
-		# 			for mut in j_d['nodes'][node.name][trait][gene]:
-		# 				usable = mut.replace(".", "J").replace("-", "X").replace("*", "J") #gaps represented by X
-		# 				temp += usable+"."
-		# 		temp += "-"
-		# else:
-			#temp += str(j_d['nodes'][node.name][trait])
 		
 			
 		node.name = node.name + temp
@@ -226,6 +234,65 @@ def assignToSpecAA(t, mutList, geneToIndex, logNotes_open):
 	return(assignment_d, heiarchy_d, clade_s)
 
 
+def assignToNucMut(t, mutList, geneToIndex, logNotes_open):
+	'''
+	input: annotated tree (t) and list of nucliotide mut (mutList) to look for
+	output:
+	assignment_d: key: leaf node name; value: clade
+	heierarchy (heiarchy_d: key:child clade; value:parent clade )
+	'''
+	clade_s = set()
+	assignment_d = {}
+	heiarchy_d = {}
+	cladesAssinged_d ={}
+
+	currentClade = 'anc'
+	heiarchy_d['anc'] = 'NA'
+	clade_s.add('anc')
+
+	for node in t.traverse("preorder"):
+		assignment_d[node.name] = currentClade
+
+	for node in t.traverse("preorder"):
+
+		node_name = node.name
+
+		nodeMut_l = node_name.split("_")[-1].split(".")
+		currentClade = assignment_d[node_name]
+
+		mutOfInterst_count = 0
+
+		for mutToFind in mutList:
+			for currentMut in nodeMut_one:
+				if mutToFind[1:-1] == nodeMut_one[1:-1]:
+					if mutToFind[0] == "*" or mutToFind[0] == nodeMut_one[0]:
+						if mutToFind[-1] == "*" or mutToFind[-1] == nodeMut_one[-1]:
+							mutOfInterst_count += 1
+							mutFound = nodeMut_one
+		if mutOfInterst_count == 1:
+			if mutFound not in cladesAssinged_d:
+				cladesAssinged_d[mutFound] = 0
+			cladesAssinged_d[mutFound] += 1
+
+			newClade = mutFound+ "_" + str(cladesAssinged_d[mutFound])
+			clade_s.add(newClade)
+
+			heiarchy_d[newClade] = currentClade
+			assignment_d[node_name] = newClade
+
+			for des_node in node.iter_descendants("postorder"):
+				assignment_d[des_node.name] = newClade
+
+		if mutOfInterst_count > 1:
+			#print("found more than 1 mut of interst", node_name)
+			logNotes_open.write("\n"+"found more than 1 mut of interst"+"\n")
+			logNotes_open.write(node_name+"\n")
+
+
+
+	return(assignment_d, heiarchy_d, clade_s)
+
+
 def assignToTraits(t, ofInterst_l = []):
 	'''
 	input: annotated tree (t) 
@@ -257,7 +324,7 @@ def assignToTraits(t, ofInterst_l = []):
 
 
 			#define new calde because does not match parent
-			if currentClade.split("_")[0] != traitOfNode:
+			if currentClade.split("_")[0] != traitOfNode and traitOfNode != "?":
 				if traitOfNode not in cladesAssinged_d:
 					cladesAssinged_d[traitOfNode] = 0
 				cladesAssinged_d[traitOfNode] += 1
@@ -356,20 +423,23 @@ def countAbudanceFromNames_byWeek(assignment_d, clade_s, startDate, endDate, del
 
 		for tip in assignment_d.keys():
 			if "NODE_" not in tip and "Wuhan" not in tip:
-				tip_date = date.fromisoformat(tip.split("_")[-2])
+				try: 
+					tip_date = date.fromisoformat(tip.split("_")[-2])
 
-				if tip_date < currentEnd and tip_date >= currentStart:
+					if tip_date < currentEnd and tip_date >= currentStart:
 
-					clade = assignment_d[tip]
-					if clade not in abundances_d[weekName]:
-						abundances_d[weekName][clade] = 1
-					abundances_d[weekName][clade] += 1
-					if clade != 'anc':
-						tipNoAnnot = ""
-						for name in tip.split("_")[:-3]: 
-							tipNoAnnot = tipNoAnnot + "_"  + name
-						outLine = "	".join([ weekName, clade, tip, tipNoAnnot[1:]]) + "\n"
-						tipLog_open.write(outLine)
+						clade = assignment_d[tip]
+						if clade not in abundances_d[weekName]:
+							abundances_d[weekName][clade] = 1
+						abundances_d[weekName][clade] += 1
+						if clade != 'anc':
+							tipNoAnnot = ""
+							for name in tip.split("_")[:-3]: 
+								tipNoAnnot = tipNoAnnot + "_"  + name
+							outLine = "	".join([ weekName, clade, tip, tipNoAnnot[1:]]) + "\n"
+							tipLog_open.write(outLine)
+				except ValueError:
+					pass 
 
 
 		currentEnd += delta
@@ -401,16 +471,19 @@ def main():
 
 	treeAndtraits = parser.add_mutually_exclusive_group(required=True)
 	treeAndtraits.add_argument('-n', '--inNextstrain', type=str, help="nextstrain results with tree.nwk and [traitOfInterst].json")
-	treeAndtraits.add_argument('-a', '--annotatedTree', type=str, help="nexus file name  and [traitOfInterst].json")
+	treeAndtraits.add_argument('-a', '--annotatedTree', type=str, help="nexus file name")
 
 
 	parser.add_argument('-m', '--inMeta', required=True, type=str, help="metadata tsv with 'strain'	and 'date'cols, optional: cols of trait of interst; and pangolin col named: 'lineage' or 'pangolin_lin'")
 	parser.add_argument('-p', '--inPangolin', required=False, type=str, default = "metadata", help="pangolin output lineage_report.csv file, if argument not supplied looks in inMeta for col with 'pangolin_lin' or 'lineage'")
+	parser.add_argument("--noPangolin", action="store_true", help="do not add lineage to cade names")
+
 
 	parser.add_argument('-f', '--traitOfInterstFile', required=False, type=str, default="aa_muts.json",  help="name of nextstrain [traitOfInterst].json in 'inNextstrain' folder")
-	parser.add_argument('-k', '--traitOfInterstKey', required=False, type=str, default="aa_muts",  help="key for trait of interst in json file")
+	parser.add_argument('-g', '--geneBoundry', required=False, type=str, help="json formated file specifing start end postions of genes in alnment for annotatedTree with aa_muts option")
+	parser.add_argument('-k', '--traitOfInterstKey', required=False, type=str, default="aa_muts",  help="key for trait of interst in json file or annotated tree file for aa with 'mutations' annotation, use 'aa_muts', see example data/geneAAboundries.json")
 
-	parser.add_argument('-aa', '--aaVOClist', required=False, nargs='+', help="list of aa of interest in form [GENE][*ORAncAA][site][*ORtoAA] ex. S*501*, gaps represed by X")
+	parser.add_argument('-mut', '--VOClist', required=False, nargs='+', help="list of aa of interest in form [GENE][*ORAncAA][site][*ORtoAA] ex. S*501*, gaps represed by X")
 
 
 
@@ -483,7 +556,8 @@ def main():
 		t = Tree(tempTree_name, format = 3)
 
 
-		t = annotateNwk_treetime(t, nodeTraits_d,args.traitOfInterstKey, indexToGene, geneToIndex, sampDate_d, sampPangolin_d)
+		geneBoundry_d = json.load(open(args.geneBoundry))
+		t = annotateNwk_treetime(t, nodeTraits_d, args.traitOfInterstKey, geneBoundry_d, indexToGene, geneToIndex, sampDate_d, sampPangolin_d)
 
 
 	######################### make clades assignments (assignment_d: key: leaf node name; value: clade) and heierarchy (heiarchy_d: key:child clade; value:parent clade )
@@ -500,26 +574,40 @@ def main():
 
 	logNotes_open = open(logNotes_name, "w")
 	if args.traitOfInterstKey == 'aa_muts':
-		if args.aaVOClist is None:
+		if args.VOClist is None:
 
 			aa_mut = ["S*484*", "S*501*", "S*13*", "S*452*", "S*477*", "N*205*", "S*253*"]
 
 		else:
-			aa_mut = args.aaVOClist
+			aa_mut = args.VOClist
 
 		print("\n")
-		print("Searching for muations with:", aa_mut)
+		print("Searching for aa muations with:", aa_mut)
 
 		
-		logNotes_open.write("\n"+"Searching for muations with:"+str(aa_mut)+"\n")
+		logNotes_open.write("\n"+"Searching for aa muations with:"+str(aa_mut)+"\n")
 
 
 		assignment_d, heiarchy_d, clade_s = assignToSpecAA(t, aa_mut, geneToIndex, logNotes_open)
+	elif args.traitOfInterstKey == 'mutations' or args.traitOfInterstKey == 'muts':
+		if args.VOClist is None:
+			nuc_mut = ["*23063*", "*22320*"] #mostly for testing purposes 
+
+		else:
+			nuc_mut = args.VOClist
+
+		print("\n")
+		print("Searching for muations with:", nuc_mut)
+
+		logNotes_open.write("\n"+"Searching for muations with:"+str(nuc_mut)+"\n")
+
+
+		assignment_d, heiarchy_d, clade_s = assignToNucMut(t, mutList, geneToIndex, logNotes_open)
 	else:
 		logNotes_open.write("\n"+"Finding clades defined by"+str(args.traitOfInterstKey)+"\n")
 		assignment_d, heiarchy_d, clade_s = assignToTraits(t)
 
-	if sampPangolin_d != {}:
+	if sampPangolin_d != {} and not args.noPangolin:
 		assignment_d, heiarchy_d, clade_s = assignCladeToLin(assignment_d, heiarchy_d, clade_s)
 
 

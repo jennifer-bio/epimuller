@@ -97,22 +97,17 @@ epimuller \
 Known edge cases which are not correctly dealt with or features I intend to address (eventually).
 If you run into anything else please let me know with an issue on [gitHub](https://github.com/jennifer-bio/epimuller/issues).
 ```
-	- nt_muts ; not set up for nt mutations (only amino acid or trait)
-	- only takes nextstrain json files - intending to set up to take treetime output
 	- feel free to ignore the undefined.svg that gets made - it is related to checking the size of the text to space out labels
-	- add plot and font size to arg options
-	- define by combination of aa mutants/not just 1
-	- deal with polytomies
+
+	- nt_muts ; not set up for nt mutations (only amino acid or trait)
+	- define by combination of aa mutants, not just 1
+	- define polytomy behavior
 ```
 
 ## Addtional features
 
 ##### Color
 If you would like to specify color for clade: in --parentHierarchy_name file (of epimuller-draw/drawMuller.py input) add col with name: "color" and hex color value (starting with #) for clades you want to specify.
-
-##### Plot and font size
-In the file: scripts/drawMuller.py ; near top of script change value for desired WIDTH, HEIGHT, LEGENDWIDTH (space on right side of plot for labels), MARGIN, or FONTSIZE variables.
-Then run with source code in epimuller folder by $python3 scripts/drawMuller.py [Arugments]
 
 ##### Parse GISAID fasta for metadata
 epimuller-parse

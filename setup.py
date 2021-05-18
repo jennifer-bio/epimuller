@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-version='0.0.5'
+version='0.0.6'
 
 requirements = [
                 "ete3",

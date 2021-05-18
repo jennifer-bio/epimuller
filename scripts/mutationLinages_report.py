@@ -47,10 +47,13 @@ def main():
 	#defClades_group.add_argument('-n', '--inNextstrain', required=True, type=str, help="nextstrain results with tree.nwk and [traitOfInterst].json")
 	defClades_group.add_argument('-m', '--inMeta', required=True, type=str, help="metadata tsv with 'strain'	and 'date'cols, optional: cols of trait of interst; and pangolin col named: 'lineage' or 'pangolin_lin'")
 	defClades_group.add_argument('-p', '--inPangolin', required=False, type=str, default = "metadata", help="pangolin output lineage_report.csv file, if argument not supplied looks in inMeta for col with 'pangolin_lin' or 'lineage'")
+	defClades_group.add_argument("--noPangolin", action="store_true", help="do not add lineage to cade names")
 
 	defClades_group.add_argument('-f', '--traitOfInterstFile', required=False, type=str, default="aa_muts.json",  help="name of nextstrain [traitOfInterst].json in 'inNextstrain' folder")
-	defClades_group.add_argument('-k', '--traitOfInterstKey', required=False, type=str, default="aa_muts",  help="key for trait of interst in json file")
-	defClades_group.add_argument('-aa', '--aaVOClist', required=False, nargs='+', help="list of aa of interest in form [GENE][*ORAncAA][site][*ORtoAA] ex. S*501*, gaps represed by X")
+	defClades_group.add_argument('-g', '--geneBoundry', required=False, type=str, help="json formated file specifing start end postions of genes in alnment for annotatedTree with aa_muts option")
+
+	defClades_group.add_argument('-k', '--traitOfInterstKey', required=False, type=str, default="aa_muts",  help="key for trait of interst in json file or annotated tree file for aa with 'mutations' annotation, use 'aa_muts'")
+	defClades_group.add_argument('-mut', '--VOClist', required=False, nargs='+', help="list of aa of interest in form [GENE][*ORAncAA][site][*ORtoAA] ex. S*501*, gaps represed by X")
 
 
 	defClades_group.add_argument('-t', '--timeWindow', required=False, type=str, default="7", help="number of days for sampling window")
@@ -102,16 +105,26 @@ def main():
 	else:
 		treeAndtraits = "--annotatedTree " + args.annotatedTree
 
+	if args.noPangolin:
+		noPangolin = " --noPangolin "
+	else:
+		noPangolin = ""
+
+	if args.geneBoundry is not None:
+		geneBoundry = " --geneBoundry " args.geneBoundry + " "
+	else:
+		geneBoundry = ""
+
 
 	oscommand = " ".join([commandCallDefine, "--outDirectory", args.outDirectory , "--outPrefix", args.outPrefix ,
 	 treeAndtraits , "--inMeta", args.inMeta , "--inPangolin", args.inPangolin , 
-	 "--traitOfInterstFile", args.traitOfInterstFile , "--traitOfInterstKey", args.traitOfInterstKey , "--timeWindow", args.timeWindow ,
+	 "--traitOfInterstFile", args.traitOfInterstFile , "--traitOfInterstKey", args.traitOfInterstKey , geneBoundry + noPangolin + "--timeWindow", args.timeWindow ,
 	 "--startDate", args.startDate ,"--endDate", args.endDate])
 
 
-	if args.aaVOClist is not None:
-		oscommand = oscommand + " --aaVOClist"
-		for aa in args.aaVOClist:
+	if args.VOClist is not None:
+		oscommand = oscommand + " --VOClist"
+		for aa in args.VOClist:
 			oscommand += " " + aa
 
 

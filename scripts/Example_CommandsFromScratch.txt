@@ -1,7 +1,9 @@
 
+Cleaning and filtering steps not included, this is just inted to be a starting point
+
+
 Download from GISAID search
 
-conda activate pangolin
 pangolin inputData/GISAID_NYCPHL_04_29/gisaid_hcov-19_2021_04_30_00.fasta -o inputData/GISAID_NYCPHL_04_29 --max-ambig 75
 
 epimuller-parse -iF inputData/GISAID_NYCPHL_04_29/gisaid_hcov-19_2021_04_30_00.fasta -oM inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv -oF inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.fasta -p inputData/GISAID_NYCPHL_04_29/lineage_report.csv
@@ -43,14 +45,12 @@ augur translate \
 --reference-sequence  data/Hu-1.gb \
 --output-node-data inputData/GISAID_NYCPHL_04_29/02_nextstrainResults/aa_muts.json
 
-conda activate datetime
 epimuller -n inputData/GISAID_NYCPHL_04_29/02_nextstrainResults -m inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv -oDir 03_results_NYCPHL_April29 -oP 01_defaultAAList -min 50 -c inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-30.tsv
 
 
 
 -----------------------------------------
 
-conda activate nextstrain
 augur traits \
 --tree inputData/GISAID_NYCPHL_04_29/02_nextstrainResults/tree.nwk \
 --metadata inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv \
