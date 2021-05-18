@@ -88,14 +88,14 @@ def main():
 
 
 	#call with script
-	commandCallDefine = "python ../../epiMuller/scripts/defineAndCountClades.py"
-	commandCallDraw = "python ../../epiMuller/scripts/drawMuller.py"
+	# commandCallDefine = "python ../../epiMuller/scripts/defineAndCountClades.py"
+	# commandCallDraw = "python ../../epiMuller/scripts/drawMuller.py"
 
 
 	#call with entry_points
 
-	# commandCallDefine = "epimuller-define"
-	# commandCallDraw = "epimuller-draw"
+	commandCallDefine = "epimuller-define"
+	commandCallDraw = "epimuller-draw"
 
 
 	########################### call defineAndCountClades.py
