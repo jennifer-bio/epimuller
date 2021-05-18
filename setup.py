@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-version='0.0.6'
+version='0.0.7'
 
 requirements = [
                 "ete3",
@@ -36,7 +36,7 @@ setup(
     python_requires='>=3.7',
     classifiers=classifiers,
     description="Visualize lineages overtime, with phylogentic context, based on viral genomes",
-    packages=find_packages(),#['scripts'],#find_packages(include=['epimuller', 'epimuller.*']),
+    packages=find_packages(),#['scripts', 'scripts.*'],#find_packages(),#['scripts'],#find_packages(include=['epimuller', 'epimuller.*']),
     entry_points={
         'console_scripts': [
             'epimuller=scripts.mutationLinages_report:main',

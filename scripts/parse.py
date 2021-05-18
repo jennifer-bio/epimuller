@@ -5,7 +5,7 @@ import argparse
 import sys
 import re
 
-from treeClass import Node, parseTree
+from scripts.treeClass import Node, parseTree
 
 def getTreeRawString(tree_fileName, treeformat):
 	'''Extracts string that defines free from newick or nexus file'''

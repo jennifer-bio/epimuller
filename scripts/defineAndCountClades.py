@@ -11,7 +11,7 @@ import csv
 import json
 from statistics import mode
 
-import parse as parse
+import scripts.parse as parse
 
 
 def readInMeta(inMeta_name, pangolin):
