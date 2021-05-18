@@ -88,14 +88,14 @@ def main():
 
 
 	#call with script
-	# commandCallDefine = "python ../../epiMuller/scripts/defineAndCountClades.py"
-	# commandCallDraw = "python ../../epiMuller/scripts/drawMuller.py"
+	commandCallDefine = "python ../../epiMuller/scripts/defineAndCountClades.py"
+	commandCallDraw = "python ../../epiMuller/scripts/drawMuller.py"
 
 
 	#call with entry_points
 
-	commandCallDefine = "epimuller-define"
-	commandCallDraw = "epimuller-draw"
+	# commandCallDefine = "epimuller-define"
+	# commandCallDraw = "epimuller-draw"
 
 
 	########################### call defineAndCountClades.py
@@ -111,7 +111,7 @@ def main():
 		noPangolin = ""
 
 	if args.geneBoundry is not None:
-		geneBoundry = " --geneBoundry " args.geneBoundry + " "
+		geneBoundry = " --geneBoundry " + args.geneBoundry + " "
 	else:
 		geneBoundry = ""
 
@@ -130,6 +130,7 @@ def main():
 
 	print("\n ### Call command ###")
 	print(oscommand)
+	print("\n")
 	if os.system(oscommand) != 0:
 		sys.exit("epimuller-define failed")
 
@@ -155,6 +156,7 @@ def main():
 	
 	print("\n ### Call command ###")
 	print(oscommand)
+	print("\n")
 	if os.system(oscommand) != 0:
 		sys.exit("epimuller-draw failed")
 	

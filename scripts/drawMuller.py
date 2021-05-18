@@ -159,7 +159,7 @@ def drawWrapper(outFolder, outPrefix, root_clades_l, scaleTime, times_l, maxY, m
 	maxLabel = str(int(maxY))+ " "
 	tWidth = textwidth(maxLabel, FONTSIZE)
 	fontsize = FONTSIZE 
-	while tWidth > MARGIN:
+	while tWidth > (MARGIN-LABELSHIFT):
 		fontsize = fontsize - 1 
 		tWidth = textwidth(maxLabel, fontsize)
 	for i in range(int(maxY)):

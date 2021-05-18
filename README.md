@@ -34,15 +34,19 @@ Aligned viral genomes, collection dates, PANGO lineages, Nextstain JSON file, an
 ```
 pip3 install epimuller
 
-epimuller [-h] [-oDir OUTDIRECTORY] -oP OUTPREFIX -n
-	 INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
-	 [-f TRAITOFINTERSTFILE]
-	 [-k TRAITOFINTERSTKEY]
-	 [-aa AAVOCLIST [AAVOCLIST ...]]
-	 [-t TIMEWINDOW] [-s STARTDATE] [-e ENDDATE]
-	 [-mt MINTIME] [-min MINTOTALCOUNT]
-	 [-c CASES_NAME] [-l {date,time}]
-	 [-lp {Right,Max,Start,End}]
+epimuller [-h] [-oDir OUTDIRECTORY] -oP OUTPREFIX
+     (-n INNEXTSTRAIN | -a ANNOTATEDTREE) -m
+     INMETA [-p INPANGOLIN] [--noPangolin]
+     [-f TRAITOFINTERSTFILE] [-g GENEBOUNDRY]
+     [-k TRAITOFINTERSTKEY]
+     [-mut VOCLIST [VOCLIST ...]] [-t TIMEWINDOW]
+     [-s STARTDATE] [-e ENDDATE] [-mt MINTIME]
+     [-min MINTOTALCOUNT] [-c CASES_NAME]
+     [-l {date,time}] [-lp {Right,Max,Start,End}]
+     [--WIDTH WIDTH] [--HEIGHT HEIGHT]
+     [--LEGENDWIDTH LEGENDWIDTH] [--MARGIN MARGIN]
+     [--FONTSIZE FONTSIZE]
+     [--LABELSHIFT LABELSHIFT]
 
 ```
 
@@ -87,7 +91,7 @@ epimuller \
 	-oDir 03_results_NYCPHL_April29 \
 	-oP 03_selectedAA \
 	-c inputData/CITY_US-NY_NYC_outbreakinfo_epidemiology_data_2021-04-30.tsv \
-	-aa 'SE484K' 'S*452*' \
+	-mut 'SE484K' 'S*452*' \
 	-min 50 \ 
 	-mt 20
 ```
@@ -99,8 +103,7 @@ If you run into anything else please let me know with an issue on [gitHub](https
 ```
 	- feel free to ignore the undefined.svg that gets made - it is related to checking the size of the text to space out labels
 
-	- nt_muts ; not set up for nt mutations (only amino acid or trait)
-	- define by combination of aa mutants, not just 1
+	- allow combination of aa mutants, not just 1
 	- define polytomy behavior
 ```
 
@@ -117,74 +120,98 @@ If you have downloaded sequences from GISAID under the search tab, you can parse
 ## epimuller arguments  
 
 ```
-epimuller [-h] [-oDir OUTDIRECTORY] -oP OUTPREFIX -n
-	 INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
-	 [-f TRAITOFINTERSTFILE]
-	 [-k TRAITOFINTERSTKEY]
-	 [-aa AAVOCLIST [AAVOCLIST ...]]
-	 [-t TIMEWINDOW] [-s STARTDATE] [-e ENDDATE]
-	 [-mt MINTIME] [-min MINTOTALCOUNT]
-	 [-c CASES_NAME] [-l {date,time}]
-	 [-lp {Right,Max,Start,End}]
+epimuller [-h] [-oDir OUTDIRECTORY] -oP OUTPREFIX
+         (-n INNEXTSTRAIN | -a ANNOTATEDTREE) -m
+         INMETA [-p INPANGOLIN] [--noPangolin]
+         [-f TRAITOFINTERSTFILE] [-g GENEBOUNDRY]
+         [-k TRAITOFINTERSTKEY]
+         [-mut VOCLIST [VOCLIST ...]] [-t TIMEWINDOW]
+         [-s STARTDATE] [-e ENDDATE] [-mt MINTIME]
+         [-min MINTOTALCOUNT] [-c CASES_NAME]
+         [-l {date,time}] [-lp {Right,Max,Start,End}]
+         [--WIDTH WIDTH] [--HEIGHT HEIGHT]
+         [--LEGENDWIDTH LEGENDWIDTH] [--MARGIN MARGIN]
+         [--FONTSIZE FONTSIZE]
+         [--LABELSHIFT LABELSHIFT]
 
 optional arguments:
-	-h, --help            show this help message and exit
+  -h, --help            show this help message and exit
+  -n INNEXTSTRAIN, --inNextstrain INNEXTSTRAIN
+		nextstrain results with tree.nwk and
+		[traitOfInterst].json (default: None)
+  -a ANNOTATEDTREE, --annotatedTree ANNOTATEDTREE
+		nexus file name and [traitOfInterst].json (default:
+		None)
 
 Options for full repot:
-	-oDir OUTDIRECTORY, --outDirectory OUTDIRECTORY
+  -oDir OUTDIRECTORY, --outDirectory OUTDIRECTORY
 		folder for output (default: ./)
-	-oP OUTPREFIX, --outPrefix OUTPREFIX
+  -oP OUTPREFIX, --outPrefix OUTPREFIX
 		prefix of out files withen outDirectory (default:
 		None)
 
 Options passed to epimuller-define:
-	-n INNEXTSTRAIN, --inNextstrain INNEXTSTRAIN
-		nextstrain results with tree.nwk and
-		[traitOfInterst].json (default: None)
-	-m INMETA, --inMeta INMETA
+  -m INMETA, --inMeta INMETA
 		metadata tsv with 'strain' and 'date'cols, optional:
 		cols of trait of interst; and pangolin col named:
 		'lineage' or 'pangolin_lin' (default: None)
-	-p INPANGOLIN, --inPangolin INPANGOLIN
+  -p INPANGOLIN, --inPangolin INPANGOLIN
 		pangolin output lineage_report.csv file, if argument
 		not supplied looks in inMeta for col with
 		'pangolin_lin' or 'lineage' (default: metadata)
-	-f TRAITOFINTERSTFILE, --traitOfInterstFile TRAITOFINTERSTFILE
+  --noPangolin          do not add lineage to cade names (default: False)
+  -f TRAITOFINTERSTFILE, --traitOfInterstFile TRAITOFINTERSTFILE
 		name of nextstrain [traitOfInterst].json in
 		'inNextstrain' folder (default: aa_muts.json)
-	-k TRAITOFINTERSTKEY, --traitOfInterstKey TRAITOFINTERSTKEY
-		key for trait of interst in json file (default:
-		aa_muts)
-	-aa AAVOCLIST [AAVOCLIST ...], --aaVOClist AAVOCLIST [AAVOCLIST ...]
+  -g GENEBOUNDRY, --geneBoundry GENEBOUNDRY
+		json formated file specifing start end postions of
+		genes in alnment for annotatedTree with aa_muts option
+		(default: None)
+  -k TRAITOFINTERSTKEY, --traitOfInterstKey TRAITOFINTERSTKEY
+		key for trait of interst in json file or annotated
+		tree file for aa with 'mutations' annotation, use
+		'aa_muts' (default: aa_muts)
+  -mut VOCLIST [VOCLIST ...], --VOClist VOCLIST [VOCLIST ...]
 		list of aa of interest in form
 		[GENE][*ORAncAA][site][*ORtoAA] ex. S*501*, gaps
 		represed by X (default: None)
-	-t TIMEWINDOW, --timeWindow TIMEWINDOW
+  -t TIMEWINDOW, --timeWindow TIMEWINDOW
 		number of days for sampling window (default: 7)
-	-s STARTDATE, --startDate STARTDATE
+  -s STARTDATE, --startDate STARTDATE
 		start date in iso format YYYY-MM-DD or 'firstDate'
 		which sets start date to first date in metadata
 		(default: 2020-03-01)
-	-e ENDDATE, --endDate ENDDATE
+  -e ENDDATE, --endDate ENDDATE
 		end date in iso format YYYY-MM-DD or 'lastDate' which
 		sets end date as last date in metadata (default:
 		lastDate)
 
 Options passed to epimuller-draw:
-	-mt MINTIME, --MINTIME MINTIME
+  -mt MINTIME, --MINTIME MINTIME
 		minimum time point to start plotting (default: 30)
-	-min MINTOTALCOUNT, --MINTOTALCOUNT MINTOTALCOUNT
+  -min MINTOTALCOUNT, --MINTOTALCOUNT MINTOTALCOUNT
 		minimum total count for group to be included (default:
-		10)
-	-c CASES_NAME, --cases_name CASES_NAME
+		50)
+  -c CASES_NAME, --cases_name CASES_NAME
 		file with cases - formated with 'date' in ISO format
 		and 'confirmed_rolling' cases, in tsv format (default:
 		None)
-	-l {date,time}, --xlabel {date,time}
+  -l {date,time}, --xlabel {date,time}
 		Format of x axis label: ISO date format or timepoints
 		from start (default: date)
-	-lp {Right,Max,Start,End}, --labelPosition {Right,Max,Start,End}
+  -lp {Right,Max,Start,End}, --labelPosition {Right,Max,Start,End}
 		choose position of clade labels (default: Right)
+
+Options passed to epimuller-draw for page setup:
+  --WIDTH WIDTH         WIDTH of page (px) (default: 1500)
+  --HEIGHT HEIGHT       HEIGHT of page (px) (default: 1000)
+  --LEGENDWIDTH LEGENDWIDTH
+		LEGENDWIDTH to the right of plotting area (px)
+		(default: 220)
+  --MARGIN MARGIN       MARGIN around all sides of plotting area (px)
+		(default: 60)
+  --FONTSIZE FONTSIZE
+  --LABELSHIFT LABELSHIFT
 
 ```
 
@@ -193,46 +220,57 @@ Options passed to epimuller-draw:
 ## epimuller-define: make abundance and hiearchy files 
 
 ```
-epimuller-define [-h] -n INNEXTSTRAIN -m INMETA [-p INPANGOLIN]
-	 [-f TRAITOFINTERSTFILE] [-k TRAITOFINTERSTKEY]
-	 [-aa AAVOCLIST [AAVOCLIST ...]]
-	 [-oDir OUTDIRECTORY] -oP OUTPREFIX
-	 [-t TIMEWINDOW] [-s STARTDATE] [-e ENDDATE]
+epimuller-define  [-h] (-n INNEXTSTRAIN | -a ANNOTATEDTREE) -m
+       INMETA [-p INPANGOLIN] [--noPangolin]
+       [-f TRAITOFINTERSTFILE] [-g GENEBOUNDRY]
+       [-k TRAITOFINTERSTKEY]
+       [-mut VOCLIST [VOCLIST ...]]
+       [-oDir OUTDIRECTORY] -oP OUTPREFIX
+       [-t TIMEWINDOW] [-s STARTDATE] [-e ENDDATE]
 
 optional arguments:
-	-h, --help            show this help message and exit
-	-n INNEXTSTRAIN, --inNextstrain INNEXTSTRAIN
+  -h, --help            show this help message and exit
+  -n INNEXTSTRAIN, --inNextstrain INNEXTSTRAIN
 		nextstrain results with tree.nwk and
 		[traitOfInterst].json (default: None)
-	-m INMETA, --inMeta INMETA
+  -a ANNOTATEDTREE, --annotatedTree ANNOTATEDTREE
+		nexus file name (default: None)
+  -m INMETA, --inMeta INMETA
 		metadata tsv with 'strain' and 'date'cols, optional:
 		cols of trait of interst; and pangolin col named:
 		'lineage' or 'pangolin_lin' (default: None)
-	-p INPANGOLIN, --inPangolin INPANGOLIN
+  -p INPANGOLIN, --inPangolin INPANGOLIN
 		pangolin output lineage_report.csv file, if argument
 		not supplied looks in inMeta for col with
 		'pangolin_lin' or 'lineage' (default: metadata)
-	-f TRAITOFINTERSTFILE, --traitOfInterstFile TRAITOFINTERSTFILE
+  --noPangolin          do not add lineage to cade names (default: False)
+  -f TRAITOFINTERSTFILE, --traitOfInterstFile TRAITOFINTERSTFILE
 		name of nextstrain [traitOfInterst].json in
 		'inNextstrain' folder (default: aa_muts.json)
-	-k TRAITOFINTERSTKEY, --traitOfInterstKey TRAITOFINTERSTKEY
-		key for trait of interst in json file (default:
-		aa_muts)
-	-aa AAVOCLIST [AAVOCLIST ...], --aaVOClist AAVOCLIST [AAVOCLIST ...]
+  -g GENEBOUNDRY, --geneBoundry GENEBOUNDRY
+		json formated file specifing start end postions of
+		genes in alnment for annotatedTree with aa_muts option
+		(default: None)
+  -k TRAITOFINTERSTKEY, --traitOfInterstKey TRAITOFINTERSTKEY
+		key for trait of interst in json file or annotated
+		tree file for aa with 'mutations' annotation, use
+		'aa_muts', see example data/geneAAboundries.json
+		(default: aa_muts)
+  -mut VOCLIST [VOCLIST ...], --VOClist VOCLIST [VOCLIST ...]
 		list of aa of interest in form
 		[GENE][*ORAncAA][site][*ORtoAA] ex. S*501*, gaps
 		represed by X (default: None)
-	-oDir OUTDIRECTORY, --outDirectory OUTDIRECTORY
+  -oDir OUTDIRECTORY, --outDirectory OUTDIRECTORY
 		folder for output (default: ./)
-	-oP OUTPREFIX, --outPrefix OUTPREFIX
+  -oP OUTPREFIX, --outPrefix OUTPREFIX
 		prefix of out files withen outDirectory (default:
 		None)
-	-t TIMEWINDOW, --timeWindow TIMEWINDOW
+  -t TIMEWINDOW, --timeWindow TIMEWINDOW
 		number of days for sampling window (default: 7)
-	-s STARTDATE, --startDate STARTDATE
+  -s STARTDATE, --startDate STARTDATE
 		start date in iso format YYYY-MM-DD or 'firstDate'
 		which is in metadata (default: 2020-03-01)
-	-e ENDDATE, --endDate ENDDATE
+  -e ENDDATE, --endDate ENDDATE
 		end date in iso format YYYY-MM-DD or 'lastDate' which
 		is in metadata (default: lastDate)
 ```
@@ -242,36 +280,50 @@ optional arguments:
 
 ```
 epimuller-draw [-h] -p PARENTHIERARCHY_NAME -a ABUNDANCE_NAME
-	 [-c CASES_NAME] -o OUTFOLDER [-mt MINTIME]
-	 [-min MINTOTALCOUNT] [-l {date,time}]
-	 [-lp {Right,Max,Start,End}]
+		[-c CASES_NAME] -o OUTFOLDER [-mt MINTIME]
+		[-min MINTOTALCOUNT] [-l {date,time}]
+		[-lp {Right,Max,Start,End}] [--WIDTH WIDTH]
+		[--HEIGHT HEIGHT] [--LEGENDWIDTH LEGENDWIDTH]
+		[--LABELSHIFT LABELSHIFT] [--MARGIN MARGIN]
+		[--FONTSIZE FONTSIZE]
 
 optional arguments:
-	-h, --help            show this help message and exit
-	-p PARENTHIERARCHY_NAME, --parentHierarchy_name PARENTHIERARCHY_NAME
+  -h, --help            show this help message and exit
+  -p PARENTHIERARCHY_NAME, --parentHierarchy_name PARENTHIERARCHY_NAME
 		csv output from mutationLinages_report.py with child
 		parent col (default: None)
-	-a ABUNDANCE_NAME, --abundance_name ABUNDANCE_NAME
+  -a ABUNDANCE_NAME, --abundance_name ABUNDANCE_NAME
 		csv output from mutationLinages_report.py with
 		abundances of clades (default: None)
-	-c CASES_NAME, --cases_name CASES_NAME
+  -c CASES_NAME, --cases_name CASES_NAME
 		file with cases - formated with 'date' in ISO format
 		and 'confirmed_rolling' cases, in tsv format (default:
 		None)
-	-o OUTFOLDER, --outFolder OUTFOLDER
+  -o OUTFOLDER, --outFolder OUTFOLDER
 		csv output from mutationLinages_report.py with child
 		parent col (default: None)
-	-mt MINTIME, --MINTIME MINTIME
+  -mt MINTIME, --MINTIME MINTIME
 		minimum time point to start plotting (default: 30)
-	-min MINTOTALCOUNT, --MINTOTALCOUNT MINTOTALCOUNT
+  -min MINTOTALCOUNT, --MINTOTALCOUNT MINTOTALCOUNT
 		minimum total count for group to be included (default:
-		10)
-	-l {date,time}, --xlabel {date,time}
+		50)
+  -l {date,time}, --xlabel {date,time}
 		Format of x axis label: ISO date format or timepoints
 		from start (default: date)
-	-lp {Right,Max,Start,End}, --labelPosition {Right,Max,Start,End}
+  -lp {Right,Max,Start,End}, --labelPosition {Right,Max,Start,End}
 		choose position of clade labels (default: Right)
 
+Options for page setup:
+  --WIDTH WIDTH         WIDTH of page (px) (default: 1500)
+  --HEIGHT HEIGHT       HEIGHT of page (px) (default: 1000)
+  --LEGENDWIDTH LEGENDWIDTH
+		LEGENDWIDTH to the right of plotting area (px)
+		(default: 220)
+  --LABELSHIFT LABELSHIFT
+		nudge label over by LABELSHIFT (px) (default: 15)
+  --MARGIN MARGIN       MARGIN around all sides of plotting area (px)
+		(default: 60)
+  --FONTSIZE FONTSIZE
 ```
 
 ## Install methods

@@ -122,6 +122,8 @@ def annotateNwk_nextstrain(t, j_d, trait, indexToGene, geneToIndex, sampDate_d, 
 
 def treetimeToTraits_d(parseT, traitOfInterstKey):
 	nodeTraits_d = {}
+	if traitOfInterstKey == "aa_muts":
+		traitOfInterstKey = "mutations"
 	for node in parse.traverse_depthFirst(parseT.root):
 		temp = getattr(node, traitOfInterstKey, None)
 		if temp is not None:
@@ -133,6 +135,7 @@ def treetimeToTraits_d(parseT, traitOfInterstKey):
 
 
 def annotateNwk_treetime(t, nodeTraits_d, trait, geneBoundry_d, indexToGene, geneToIndex, sampDate_d, sampPangolin_d):
+	
 	for node in t.traverse("preorder"):
 		if "NODE_" not in node.name:
 			if node.name in sampPangolin_d:
@@ -148,11 +151,13 @@ def annotateNwk_treetime(t, nodeTraits_d, trait, geneBoundry_d, indexToGene, gen
 			
 			for index in range(12):
 				refGene = indexToGene[index]
-				for mutRaw in mutList.split(","):
-					rawPos = int(mutRaw[1:-1])
-					if rawPos >= geneBoundry_d[refGene][0] and rawPos < geneBoundry_d[refGene][1]:
-						mutRaw.replace(".", "J").replace("-", "X").replace("*", "J")
-						temp += mutRaw[0] + str(rawPos - geneBoundry_d[refGene]) + mutRaw[-1] + "."
+				if refGene in geneBoundry_d:
+					for mutRaw in mutList.split(","):
+						if len(mutRaw) > 2:
+							rawPos = int(mutRaw[1:-1])
+							if rawPos >= geneBoundry_d[refGene][0] and rawPos < geneBoundry_d[refGene][1]:
+								mutRaw.replace(".", "J").replace("-", "X").replace("*", "J")
+								temp += mutRaw[0] + str(rawPos - geneBoundry_d[refGene][0]) + mutRaw[-1] + "."
 				temp += "-"
 			temp += str(nodeTraits_d[node.name])
 			#todo loop through and assign postion in appened aa to genes using renameAln_codingRegions_geneAAboundries.json
@@ -475,7 +480,7 @@ def main():
 
 
 	parser.add_argument('-m', '--inMeta', required=True, type=str, help="metadata tsv with 'strain'	and 'date'cols, optional: cols of trait of interst; and pangolin col named: 'lineage' or 'pangolin_lin'")
-	parser.add_argument('-p', '--inPangolin', required=False, type=str, default = "metadata", help="pangolin output lineage_report.csv file, if argument not supplied looks in inMeta for col with 'pangolin_lin' or 'lineage'")
+	parser.add_argument('-p', '--inPangolin', required=False, type=str, default = "metadata", help="pangolin output lineage_report.csv file, if argument not supplied looks in inMeta for col with 'pangolin_lineage', 'pangolin_lin', or 'lineage'")
 	parser.add_argument("--noPangolin", action="store_true", help="do not add lineage to cade names")
 
 
@@ -546,6 +551,15 @@ def main():
 		t = annotateNwk_nextstrain(t, j_d, args.traitOfInterstKey, indexToGene, geneToIndex, sampDate_d, sampPangolin_d)
 
 	else: #use treetime ancestral as input
+		if args.traitOfInterstKey=="aa_muts":
+			if args.geneBoundry is None :
+				sys.exit("geneBoundry json file is required for annotatedTree with aa_muts")
+			else:
+				geneBoundry_d = json.load(open(args.geneBoundry))
+		else:
+			geneBoundry_d = {}
+
+
 		parseT = parse.treeImport_wrap(args.annotatedTree, ["nexus", "treetimeAnnot"])
 
 		nodeTraits_d = treetimeToTraits_d(parseT, args.traitOfInterstKey)
@@ -555,8 +569,6 @@ def main():
 		parse.writeNewick(parseT, tempTree_name, []) #write to file that can be read by ete3
 		t = Tree(tempTree_name, format = 3)
 
-
-		geneBoundry_d = json.load(open(args.geneBoundry))
 		t = annotateNwk_treetime(t, nodeTraits_d, args.traitOfInterstKey, geneBoundry_d, indexToGene, geneToIndex, sampDate_d, sampPangolin_d)
 
 
