@@ -14,7 +14,7 @@ Visualize lineages overtime, with phylogentic context, based on viral genomes.
 Python3
 
 ###### Inputs
-Aligned viral genomes, collection dates, PANGO lineages, Nextstain JSON file, and timetree
+timetree, ancestral state reconstruction (Nextstain JSON file or annotated TreeTime nexus file), sample collection dates and, PANGO lineages (optional)
 
 ###### Workflow overview
 
@@ -94,6 +94,30 @@ epimuller \
 	-mut 'SE484K' 'S*452*' \
 	-min 50 \ 
 	-mt 20
+```
+
+##### Visulize default aa mutation list with TreeTime input
+
+```
+epimuller \
+	-a inputData/GISAID_NYCPHL_04_29/06_treetimeDates_aa/timetree.nexus \
+	-oDir 04_results_NYCPHL_April29 \
+	-oP defaultAA_treetime \
+	-m inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv \
+	-g data/geneAAboundries.json \
+	--FONTSIZE 18
+```
+
+##### Visulize a trait: lineage with TreeTime input
+
+```
+epimuller \
+	-a inputData/GISAID_NYCPHL_04_29/06_treetimeDates_aa/timetree.nexus \
+	-oDir 03_results_NYCPHL_April29 \
+	-oP 05_pangolin_treetime \
+	-m inputData/GISAID_NYCPHL_04_29/gisaid_2021_04_30_00_rename.tsv \
+	--traitOfInterstKey lineage \
+	--noPangolin #do not label with mode of pangolin lineages in clade, label clade with defining lineage only 
 ```
 
 
@@ -359,7 +383,7 @@ python3 setup.py install
 ```
 
 ##### Run scripts directly
-This is currently the best way to change display and font size, howerver you will have to install all dependencies.
+Note you will have to install all dependencies.
 
 Download source code from [gitHub](https://github.com/jennifer-bio/epimuller) or [pypi](https://pypi.org/project/epimuller/)
 
