@@ -16,7 +16,7 @@ def main():
 	parser.add_argument('-iF', '--inFasta', required=True, type=str, help="full metadata file with ISO date after last '|' in name")
 	parser.add_argument('-oM', '--outMeta', required=True, type=str, help="output for metadata file")
 	parser.add_argument('-oF', '--outFasta', required=True, type=str, help="output for fasta file")
-	parser.add_argument('-p', '--inPangolin', required=False, type=str, default = "metadata", help="pangolin output lineage_report.csv file, if argument not supplied adds ? in 'lineage' col")
+	parser.add_argument('-p', '--inPangolin', required=False, type=str, help="pangolin output lineage_report.csv file, if argument not supplied adds ? in 'lineage' col")
 
 
 	args = parser.parse_args()
