@@ -129,6 +129,7 @@ If you run into anything else please let me know with an issue on [gitHub](https
 
 	- allow combination of aa mutants, not just 1
 	- define polytomy behavior
+	- option for user defined col names in metadata
 ```
 
 ## Addtional features
