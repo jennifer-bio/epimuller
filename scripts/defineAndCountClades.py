@@ -63,6 +63,7 @@ def readInMeta(inMeta_name, pangolin):
 			date_index = line_l.index("Date")
 
 		else:
+			print("Metadata must have 'strain' and 'date' OR 'Name' and 'Date' in first line with tab or comma seperated and no spaces. Current col are:")
 			sys.exit(line_l)
 			#"Must have 'strain' and 'date' in first line of tab seperated"
 
