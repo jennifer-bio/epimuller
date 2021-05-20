@@ -31,7 +31,10 @@ def readInMeta(inMeta_name, pangolin):
 		line_l = re.split('\t|,', line.strip())
 		if strain_index != "NA":
 			tipName = line_l[strain_index]
-			tipDate = line_l[date_index]
+			try:
+				tipDate = line_l[date_index]
+			except:
+				tipDate = ""
 
 			sampDate_d[tipName] = tipDate 
 
@@ -71,7 +74,8 @@ def readInMeta(inMeta_name, pangolin):
 			elif "lineage" in line_l:
 				pangolin_index = line_l.index("lineage")
 			else:
-				print("pangolin not found in metadata, col must be called 'pangolin_lin', 'pangolin_lineage', or 'lineage' ")
+				if sampDate_d == {}: #only print once
+					print("pangolin not found in metadata, col must be called 'pangolin_lin', 'pangolin_lineage', or 'lineage' ")
 
 	
 	if pangolin != 'metadata': # pangolin output lineage report file name

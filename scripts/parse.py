@@ -9,8 +9,8 @@ from scripts.treeClass import Node, parseTree
 
 def getTreeRawString(tree_fileName, treeformat):
 	'''Extracts string that defines free from newick or nexus file'''
-	treeformat_d = parseFormat(treeformat)
 
+	treeformat_d = parseFormat(treeformat)
 
 	tree_fileOpen = open(tree_fileName, "r")
 
@@ -18,10 +18,13 @@ def getTreeRawString(tree_fileName, treeformat):
 		nextLine = False
 
 		for line in tree_fileOpen:
-			if 'Begin Trees;' in line:
+			if 'Begin Trees;' in line or "begin trees" in line:
 				nextLine = True
 			elif nextLine:
-				treeRawString = "=".join(line.strip().split("=")[1:])
+				#treeRawString = "=".join(line.strip().split("=")[1:])
+				temp = line.strip()
+				treeIndexStart = temp.index("(")
+				treeRawString = temp[treeIndexStart:]
 				nextLine = False
 	elif treeformat_d["fileFormat"] == "newick":
 		treeRawString = ""
@@ -108,6 +111,7 @@ def buildTree(treeString, treeformat, openParen_d, closeParn_d, commaParn_d, sub
 	currntTreeString = treeString[subTstart+1:subTend]
 
 
+
 	if "(" in currntTreeString: 
 		#internal nodes
 
@@ -135,10 +139,10 @@ def buildTree(treeString, treeformat, openParen_d, closeParn_d, commaParn_d, sub
 			currentNodeLen = currentNodeString.split(":")[1]		
 			currentNodeName = currentNodeString.split(":")[0]
 		else: #should only be in root for unrooted tree
-			currentNodeLen = 0
+			currentNodeLen = str(0)
 			currentNodeName = currentNodeString
 	else:
-		currentNodeLen = 1
+		currentNodeLen = str(1)
 		currentNodeName = currentNodeString
 
 	if treeformat_d["annotation"]:
@@ -149,7 +153,8 @@ def buildTree(treeString, treeformat, openParen_d, closeParn_d, commaParn_d, sub
 			currentNodeName = currentNodeName.split("{")[0]
 
 		elif treeformat_d["annotationType"] == "treetimeAnnot":
-			if "[" in currentNodeLen: #note: no annotation assigned to root 
+			if "[" in str(currentNodeLen): #note: no annotation assigned to root 
+
 				annotation_str = currentNodeLen.split("[")[1].replace("&", "")
 				annotKey = ""
 				annotValue = ""
@@ -175,7 +180,6 @@ def buildTree(treeString, treeformat, openParen_d, closeParn_d, commaParn_d, sub
 
 
 			currentNodeLen = currentNodeLen.split("[")[0]
-
 
 	currentNode.name = currentNodeName
 	currentNode.length = currentNodeLen

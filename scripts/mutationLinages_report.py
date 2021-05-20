@@ -42,7 +42,7 @@ def main():
 
 	treeAndtraits = parser.add_mutually_exclusive_group(required=True)
 	treeAndtraits.add_argument('-n', '--inNextstrain', type=str, help="nextstrain results with tree.nwk and [traitOfInterst].json")
-	treeAndtraits.add_argument('-a', '--annotatedTree', type=str, help="nexus file name  and [traitOfInterst].json")
+	treeAndtraits.add_argument('-a', '--annotatedTree', type=str, help="nexus file name with annotation: [&!traitOfInterst=value], as output py treetime ")
 
 	#defClades_group.add_argument('-n', '--inNextstrain', required=True, type=str, help="nextstrain results with tree.nwk and [traitOfInterst].json")
 	defClades_group.add_argument('-m', '--inMeta', required=True, type=str, help="metadata tsv with 'strain'	and 'date'cols, optional: cols of trait of interst; and pangolin col named: 'lineage' or 'pangolin_lin'")
