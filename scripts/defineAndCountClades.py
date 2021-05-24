@@ -399,6 +399,7 @@ def countAbudanceFromNames_byWeek(assignment_d, clade_s, startDate, endDate, del
 	"""
 	counts total number of tips withen each clade, for each time interval (delta) between startDate and endDate 
 	"""
+	psuodocount = 0.1
 	abundances_d = {} # key: week; value: dict of key:clade; value: count
 	weekToDate_d = {}
 	#assignment_d: key: node name; value: clade
@@ -428,7 +429,9 @@ def countAbudanceFromNames_byWeek(assignment_d, clade_s, startDate, endDate, del
 		abundances_d[weekName] = {} 
 
 		for clade in abundances_d[lastWeekName]:
-			abundances_d[weekName][clade] = 1
+			abundances_d[weekName][clade] = psuodocount #change to add psuodocount
+			# if clade == 'anc':
+			# 	abundances_d[weekName][clade] += 1
 
 
 		for tip in assignment_d.keys():
@@ -440,7 +443,7 @@ def countAbudanceFromNames_byWeek(assignment_d, clade_s, startDate, endDate, del
 
 						clade = assignment_d[tip]
 						if clade not in abundances_d[weekName]:
-							abundances_d[weekName][clade] = 1
+							abundances_d[weekName][clade] = psuodocount #change to add psuodocount
 						abundances_d[weekName][clade] += 1
 						if clade != 'anc':
 							tipNoAnnot = ""
@@ -456,7 +459,6 @@ def countAbudanceFromNames_byWeek(assignment_d, clade_s, startDate, endDate, del
 		currentStart += delta
 	tipLog_open.close()
 
-	#print(list(clade_s))
 	noFurtherAbudance = list(clade_s.copy())
 	for weekName in (reversed(week_l)):
 
@@ -464,7 +466,7 @@ def countAbudanceFromNames_byWeek(assignment_d, clade_s, startDate, endDate, del
 		for clade in noFurtherAbudance_last:
 			if clade in abundances_d[weekName]:
 
-				if abundances_d[weekName][clade] == 1 and clade != 'anc':
+				if abundances_d[weekName][clade] == psuodocount: #and clade != 'anc':
 					abundances_d[weekName][clade] = 0
 				else:
 					noFurtherAbudance.remove(clade)

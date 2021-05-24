@@ -7,7 +7,8 @@ import svgwrite #conda install svgwrite
 import random
 import cairo
 import cairosvg
-
+import re
+from datetime import date, datetime, timedelta
 
 # WIDTH = 1500
 # HEIGHT = 1000
@@ -167,28 +168,42 @@ def drawWrapper(outFolder, outPrefix, root_clades_l, scaleTime, times_l, maxY, m
 			xpos = MARGIN - (textwidth(str(i), fontsize) + LABELSHIFT)
 			ypos = MARGIN + (maxY - i)*totalHeight/maxY
 			img.add(img.text(text = str(i), insert = (xpos,  ypos + (textheight(str(i), FONTSIZE))/2), font_size=fontsize))
-			img.add(img.line(start = (MARGIN-LABELSHIFT,  ypos), end = (MARGIN+LABELSHIFT,  ypos), stroke_width=5, stroke = "black"))
-
-
+			img.add(img.line(start = (MARGIN-LABELSHIFT,  ypos), end = (MARGIN,  ypos), stroke_width=3, stroke = "black"))
 
 
 	#write x axis labels
-	if xlabel == "date":
-		tWidth = textwidth("2021-05-03", FONTSIZE)
+	if xlabel == "bimonthly":
+
+		for time in times_l:
+			stepDate = date.fromisoformat(timeToDate_d[time])
+			for t in range(timeWindow):
+				td = timedelta(days=t)
+				d = stepDate + td
+				if d.day == 15 or d.day == 1:
+					label = datetime.strptime(d.isoformat(), "%Y-%m-%d").strftime("%d %b")
+
+					img.add(img.text(text = label, insert = (timeToX(time, scaleTime, minTime),  HEIGHT-MARGIN+(2*LABELSHIFT)), font_size=FONTSIZE))
+					img.add(img.line(start = (timeToX(time, scaleTime, minTime),  HEIGHT-MARGIN+LABELSHIFT), end = (timeToX(time, scaleTime, minTime),  HEIGHT-(MARGIN)), stroke_width=3, stroke = "black"))
+				
 	else:
-		tWidth = textwidth("200", FONTSIZE)
-	numLabels = rightWidth/tWidth 
-	wirteEvery = math.ceil(len(times_l)/numLabels)
-	for time in times_l:
-		if int(time) % wirteEvery == 0:
-			#if int(time) % int(args.XLABFREQ) == 0:
-			if xlabel == "time":
-				label = str(time)
-			else:
-				label = timeToDate_d[time]
-			img.add(img.text(text = label, insert = (timeToX(time, scaleTime, minTime),  HEIGHT-MARGIN+(2*LABELSHIFT)), font_size=FONTSIZE))
-			img.add(img.line(start = (timeToX(time, scaleTime, minTime),  HEIGHT-MARGIN+LABELSHIFT), end = (timeToX(time, scaleTime, minTime),  HEIGHT-(MARGIN+LABELSHIFT)), stroke_width=5, stroke = "black"))
-	
+		if xlabel == "date":
+			tWidth = textwidth("2021-05-03", FONTSIZE)
+		else:
+			tWidth = textwidth("200", FONTSIZE)
+		numLabels = rightWidth/tWidth 
+		wirteEvery = math.ceil(len(times_l)/numLabels)
+		for time in times_l:
+			if int(time) % wirteEvery == 0:
+				#if int(time) % int(args.XLABFREQ) == 0:
+				if xlabel == "time":
+					label = str(time)
+				else:
+					label = timeToDate_d[time]
+				img.add(img.text(text = label, insert = (timeToX(time, scaleTime, minTime),  HEIGHT-MARGIN+(2*LABELSHIFT)), font_size=FONTSIZE))
+				img.add(img.line(start = (timeToX(time, scaleTime, minTime),  HEIGHT-MARGIN+LABELSHIFT), end = (timeToX(time, scaleTime, minTime),  HEIGHT-(MARGIN)), stroke_width=3, stroke = "black"))
+		
+
+
 	# write title
 	fontsize = FONTSIZE+6
 	tHeight = textheight(outPrefix, fontsize)
@@ -298,7 +313,7 @@ def removeSmallClades(abundances_d, heiarchy_d, minCount):
 		for clade in abundances_d[week]:
 			if clade not in avalibleClades_d:
 				avalibleClades_d[clade] = 0
-			avalibleClades_d[clade] += int(abundances_d[week][clade])
+			avalibleClades_d[clade] += float(abundances_d[week][clade])
 
 	old_heiarchy_d = heiarchy_d.copy()
 	for clade in old_heiarchy_d: #old_heiarchy_d.keys():
@@ -364,6 +379,7 @@ def main():
 	parser.add_argument('-a', '--abundance_name', required=True, type=str, help="csv output from mutationLinages_report.py with abundances of clades")
 
 	parser.add_argument('-c', '--cases_name', required=False, type=str, help="file with cases - formated with 'date' in ISO format and 'confirmed_rolling' cases, in tsv format")
+	parser.add_argument("--avgWindow", required=False, type=str, help="width of averaging window for cases (recomend using with small --timeWindow) ; default: total calculated in time window with not averaging")
 
 	parser.add_argument('-o', '--outFolder', required=True, type=str, help="csv output from mutationLinages_report.py with child parent col") 
 
@@ -371,9 +387,8 @@ def main():
 	parser.add_argument('-mt', '--MINTIME', required=False, type=str, default="30", help="minimum time point to start plotting")
 	parser.add_argument('-min', '--MINTOTALCOUNT', required=False, type=str, default="50", help="minimum total count for group to be included")
 
-	parser.add_argument('-l', '--xlabel', required=False, type=str, choices = ["date", "time"], default="date", help="Format of x axis label: ISO date format or timepoints from start")
+	parser.add_argument('-l', '--xlabel', required=False, type=str, choices = ["date", "time", "bimonthly"], default="date", help="Format of x axis label: ISO date format or timepoints from start, or dd-Mon-YYYY on 1st and 15th best for -t 1")
 	parser.add_argument('-lp', '--labelPosition', required=False, type=str, default="Right", choices = ["Right", "Max", "Start", "End"], help="choose position of clade labels")
-
 	#parser.add_argument("--tmrca", action="store_true", help="draw point at tmrca of clade if flag is used")
 
 
@@ -411,6 +426,7 @@ def main():
 
 	if args.labelPosition != "Right":
 		LEGENDWIDTH = 0
+
 	
 
 ########################## read in files
@@ -445,6 +461,17 @@ def main():
 					timeToDate_d[time] = line_l[date_index]
 
 	abundances_file.close()	
+
+	times_l = abundances_d.keys()
+	times_l = list(times_l)
+	times_l.sort(key=int)
+	
+
+	startDay =  date.fromisoformat(timeToDate_d[times_l[0]])
+	endDay = date.fromisoformat(timeToDate_d[times_l[1]])
+
+	global timeWindow
+	timeWindow = (endDay-startDay).days 
 
 
 	hierarchy_file = open(args.parentHierarchy_name, "r")	
@@ -507,16 +534,44 @@ def main():
 		for parent in clades_l:
 			if parent.name == child.parent_name:
 				setattr(child, "parent", parent)
-			
+
+	#rolling average over windows
+	if args.avgWindow is not None:
+		avgWindow = args.avgWindow
+
+		abudances_times_l = list(abundances_d.keys())
+		abudances_times_l.sort(key=int)
+
+		lastTime_int = int(abudances_times_l[-1])
+
+		abundances_roll_d = {}
+
+		for time in abudances_times_l:
+			abundances_roll_d[time] = {}
+			rollRange = int(avgWindow)
+			while lastTime_int + 1 < int(time) + rollRange :
+				rollRange -= 1
+
+			for rollTime_delta in range(rollRange):
+				rollTime = str(int(time) + rollTime_delta)
+				for clade_o in clades_l:
+					clade = clade_o.name
+					if clade in abundances_d[rollTime]:
+						if clade not in abundances_roll_d[time]:
+							abundances_roll_d[time][clade] = 0
+						abundances_roll_d[time][clade] += float(abundances_d[rollTime][clade])/rollRange
+
+		abundances_d = abundances_roll_d
 
 	#record abundances in objects
 	allTimes_l = []
 	for time in abundances_d:
-		if time >= args.MINTIME:
+
+		if int(time) >= int(args.MINTIME):
 			t = Snapshot(time, timeToDate_d[time])
 			for clade in clades_l:
 				if clade.name in abundances_d[time]:
-					abundance = int(abundances_d[time][clade.name])
+					abundance = float(abundances_d[time][clade.name])
 				else:
 					abundance = 0
 				clade_oneTime = CladeSnapshot(clade, t, abundance)
@@ -529,6 +584,8 @@ def main():
 	for snap in allTimes_l:
 		for cladeSnap in snap.cladeSnapshot_clade_d.values():
 			cladeSnap.sumDescendant = cladeSnap.abundance + cladeSnap.sumUpDescendants()
+
+
 
 # ################################ determain plotting values
 
@@ -590,7 +647,7 @@ def main():
 
 		numSections = len(root_clades_l) + 1
 		parentEdgeHeight = scaleFactor*(snap.sumAll - descendantSpace)/numSections
-		acountedHeight = topPlot + scaleFactor*lessThanMax
+		acountedHeight = topPlot + (scaleFactor*lessThanMax)/2 #do not split in half for plot to be on bottom
 
 		for clade in root_clades_l:
 
@@ -617,19 +674,47 @@ def main():
 
 		date_index = "na"
 		case_index = "na"
-		dateToCase_d = {}
+		dateToCase_raw_d = {}
 		cases_file = open(args.cases_name, "r")
 		for line in cases_file:
-			line_l = line.strip().split("	")
+			line_l = re.split('\t|,', line.strip())
 			if date_index == "na":
 				if "confirmed_rolling" in line_l and "date" in line_l:
 					date_index = line_l.index("date")
 					case_index = line_l.index("confirmed_rolling")
+				elif "cases" in line_l and "date" in line_l:
+					date_index = line_l.index("date")
+					case_index = line_l.index("cases")
 				else:
 					print("file with cases - formated with 'date' in ISO format and 'confirmed_rolling' cases, in tsv format")
 					sys.exit(1)
 			else:
-				dateToCase_d[line_l[date_index].replace('"', "")] = float(line_l[case_index].replace('"', ""))
+				dateToCase_raw_d[line_l[date_index].replace('"', "")] = float(line_l[case_index].replace('"', ""))
+
+
+		dateToCase_d = {}
+		if args.avgWindow is None:
+			for k in dateToCase_raw_d.keys():
+				day = date.fromisoformat(k)
+				d = day + timedelta(days=timeWindow)
+				if d.isoformat() in dateToCase_raw_d:
+					c = 0
+					for i in range(timeWindow):
+						d = day + timedelta(days=i)
+						c += dateToCase_raw_d[d.isoformat()]
+					dateToCase_d[d.isoformat()] = c/timeWindow
+		else:
+			avgWindow = int(args.avgWindow)
+			totalWindow = timeWindow*avgWindow
+			for k in dateToCase_raw_d.keys():
+				day = date.fromisoformat(k)
+				d = day + timedelta(days=totalWindow)
+				if d.isoformat() in dateToCase_raw_d:
+					c = 0
+					for i in range(totalWindow):
+						d = day + timedelta(days=i)
+						c += dateToCase_raw_d[d.isoformat()]
+					dateToCase_d[d.isoformat()] = c/totalWindow
 
 
 		topPlot = MARGIN
@@ -659,7 +744,7 @@ def main():
 
 			numSections = len(root_clades_l) + 1
 			parentEdgeHeight = scaleFactor*(snap.sumAll - descendantSpace)/numSections
-			acountedHeight = topPlot + psudoAbundance_lessThanMax*scaleFactor
+			acountedHeight = topPlot + (psudoAbundance_lessThanMax*scaleFactor)/2
 
 
 			for clade in root_clades_l:
