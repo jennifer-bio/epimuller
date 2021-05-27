@@ -94,7 +94,7 @@ def readInMeta(inMeta_name, pangolin):
 
 	return(sampDate_d, sampPangolin_d, firstDate, lastDate)
 
-def annotateNwk_nextstrain(t, j_d, trait, indexToGene, geneToIndex, sampDate_d, sampPangolin_d):
+def annotateNwk_nextstrain(t, j_d, trait, sampDate_d, sampPangolin_d):
 
 	for node in t.traverse("preorder"):
 		if "NODE_" not in node.name:
@@ -139,7 +139,7 @@ def treetimeToTraits_d(parseT, traitOfInterstKey):
 	return nodeTraits_d
 
 
-def annotateNwk_treetime(t, nodeTraits_d, trait, geneBoundry_d, indexToGene, geneToIndex, sampDate_d, sampPangolin_d):
+def annotateNwk_treetime(t, nodeTraits_d, trait, geneBoundry_d, sampDate_d, sampPangolin_d):
 	
 	for node in t.traverse("preorder"):
 		if "NODE_" not in node.name:
@@ -483,7 +483,7 @@ def main():
 
 	treeAndtraits = parser.add_mutually_exclusive_group(required=True)
 	treeAndtraits.add_argument('-n', '--inNextstrain', type=str, help="nextstrain results with tree.nwk and [traitOfInterst].json")
-	treeAndtraits.add_argument('-a', '--annotatedTree', type=str, help="nexus file name")
+	treeAndtraits.add_argument('-a', '--annotatedTree', type=str, help="nexus file name, annotated with format used by TreeTime")
 
 
 	parser.add_argument('-m', '--inMeta', required=True, type=str, help="metadata tsv with 'strain'	and 'date'cols, optional: cols of trait of interst; and pangolin col named: 'lineage' or 'pangolin_lin'")
@@ -491,12 +491,11 @@ def main():
 	parser.add_argument("--noPangolin", action="store_true", help="do not add lineage to cade names")
 
 
-	parser.add_argument('-f', '--traitOfInterstFile', required=False, type=str, default="aa_muts.json",  help="name of nextstrain [traitOfInterst].json in 'inNextstrain' folder")
-	parser.add_argument('-g', '--geneBoundry', required=False, type=str, help="json formated file specifing start end postions of genes in alnment for annotatedTree with aa_muts option")
-	parser.add_argument('-k', '--traitOfInterstKey', required=False, type=str, default="aa_muts",  help="key for trait of interst in json file or annotated tree file for aa with 'mutations' annotation, use 'aa_muts', see example data/geneAAboundries.json")
+	parser.add_argument('-f', '--traitOfInterstFile', required=False, type=str, default="aa_muts.json",  help="[use with -n/--inNextstrain] name of [traitOfInterst].json in '-n/--inNextstrain' folder")
+	parser.add_argument('-g', '--geneBoundry', required=False, type=str, help="[use with -a/--annotatedTree AND -k/--traitOfInterst aa_muts] json formated file specifing start end postions of genes in alignment for annotatedTree  (see example data/geneAAboundries.json)")
+	parser.add_argument('-k', '--traitOfInterstKey', required=False, type=str, default="aa_muts",  help="key for trait of interst in json file or annotated tree file. If -a/--annotatedTree 'mutations' are amino acids use 'aa_muts'")
 
-	parser.add_argument('-mut', '--VOClist', required=False, nargs='+', help="list of aa of interest in form [GENE][*ORAncAA][site][*ORtoAA] ex. S*501*, gaps represed by X")
-
+	parser.add_argument('-mut', '--VOClist', required=False, nargs='+', help="list of aa of interest in form [GENE][*ORAncAA][site][*ORtoAA] ex. S*501*, gaps represented by X, wild card aa represented by *")
 
 
 	parser.add_argument('-oDir', '--outDirectory', required=False, default ="./", type=str, help="folder for output")
@@ -532,9 +531,6 @@ def main():
 
 	######################### params to referance
 
-	geneToIndex = {"E":0, "M":1, "N":2, "ORF1a":3, "ORF1b":4, "ORF3a":5, "ORF6":6, "ORF7a":7, "ORF7b":8, "ORF8":9, "ORF9b":10, "S":11}
-	indexToGene = {0:"E", 1:"M", 2:"N", 3:"ORF1a", 4:"ORF1b", 5:"ORF3a", 6:"ORF6", 7:"ORF7a", 8:"ORF7b", 9:"ORF8", 10:"ORF9b", 11:"S"}
-
 
 	delta= timedelta(days=int(args.timeWindow))
 
@@ -548,6 +544,20 @@ def main():
 
 		inJSON_name = os.path.join(args.inNextstrain, args.traitOfInterstFile)
 		j_d = json.load(open(inJSON_name))
+		if args.traitOfInterstKey == "aa_muts":
+			i = 0
+			geneToIndex_temp = {}
+			indexToGene_temp = {}
+			for node in j_d['nodes'].keys():
+				for gene in j_d['nodes'][node]["aa_muts"].keys():
+					if gene not in geneToIndex:
+						geneToIndex_temp[gene] = i
+						indexToGene_temp[i] = gene
+						i += 1
+			global geneToIndex
+			geneToIndex = geneToIndex_temp.copy()
+			global indexToGene
+			indexToGene = indexToGene_temp.copy()
 
 		inTree_name = os.path.join(args.inNextstrain, "tree.nwk")
 		print(inTree_name)
@@ -555,7 +565,7 @@ def main():
 			sys.exit("missing input tree")
 		t = Tree(inTree_name, format = 3)
 
-		t = annotateNwk_nextstrain(t, j_d, args.traitOfInterstKey, indexToGene, geneToIndex, sampDate_d, sampPangolin_d)
+		t = annotateNwk_nextstrain(t, j_d, args.traitOfInterstKey, sampDate_d, sampPangolin_d)
 
 	else: #use treetime ancestral as input
 		if args.traitOfInterstKey=="aa_muts":
@@ -563,6 +573,19 @@ def main():
 				sys.exit("geneBoundry json file is required for annotatedTree with aa_muts")
 			else:
 				geneBoundry_d = json.load(open(args.geneBoundry))
+
+				i = 0
+				geneToIndex_temp = {}
+				indexToGene_temp = {}
+				for gene in geneBoundry_d.keys():
+					if gene not in geneToIndex:
+						geneToIndex_temp[gene] = i
+						indexToGene_temp[i] = gene
+						i += 1
+				global geneToIndex
+				geneToIndex = geneToIndex_temp.copy()
+				global indexToGene
+				indexToGene = indexToGene_temp.copy()
 		else:
 			geneBoundry_d = {}
 
@@ -576,7 +599,7 @@ def main():
 		parse.writeNewick(parseT, tempTree_name, []) #write to file that can be read by ete3
 		t = Tree(tempTree_name, format = 3)
 
-		t = annotateNwk_treetime(t, nodeTraits_d, args.traitOfInterstKey, geneBoundry_d, indexToGene, geneToIndex, sampDate_d, sampPangolin_d)
+		t = annotateNwk_treetime(t, nodeTraits_d, args.traitOfInterstKey, geneBoundry_d,  sampDate_d, sampPangolin_d)
 
 
 	######################### make clades assignments (assignment_d: key: leaf node name; value: clade) and heierarchy (heiarchy_d: key:child clade; value:parent clade )
