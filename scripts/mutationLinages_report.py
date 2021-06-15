@@ -87,10 +87,11 @@ def main():
 	args = parser.parse_args()
 
 
-	#call with script
-	commandCallDefine = "python ../../epiMuller/scripts/defineAndCountClades.py"
-	commandCallDraw = "python ../../epiMuller/scripts/drawMuller.py"
+	#call with script from testing folder
+	# commandCallDefine = "python ../../epiMuller/scripts/defineAndCountClades.py"
+	# commandCallDraw = "python ../../epiMuller/scripts/drawMuller.py"
 
+	#call with script from epiMuller folder
 	# commandCallDefine = "python ../scripts/defineAndCountClades.py"
 	# commandCallDraw = "python ../scripts/drawMuller.py"
 
@@ -121,7 +122,7 @@ def main():
 
 	oscommand = " ".join([commandCallDefine, "--outDirectory", args.outDirectory , "--outPrefix", args.outPrefix ,
 	 treeAndtraits , "--inMeta", args.inMeta , "--inPangolin", args.inPangolin , 
-	 "--traitOfInterstFile", args.traitOfInterstFile , "--traitOfInterstKey", args.traitOfInterstKey , geneBoundry + noPangolin + auto + "--timeWindow", args.timeWindow ,
+	 "--traitOfInterstFile", args.traitOfInterstFile , "--traitOfInterstKey", args.traitOfInterstKey , geneBoundry + noPangolin + "--timeWindow", args.timeWindow ,
 	 "--startDate", args.startDate ,"--endDate", args.endDate])
 
 

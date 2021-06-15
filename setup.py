@@ -4,14 +4,14 @@ from setuptools import setup, find_packages
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-version='0.0.7'
+version='0.0.8'
 
 requirements = [
                 "ete3",
                 "datetime",
                 "statistics",
                 "svgwrite",
-                "pycairo",
+                "pycairo<=1.20.0",
                 "cairosvg",
                 "argparse",
                 "numpy",

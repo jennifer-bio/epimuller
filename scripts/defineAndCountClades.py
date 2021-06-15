@@ -360,8 +360,6 @@ def assignCladeToLin(assignment_old_d, heiarchy_old_d, clade_old_s):
 	mode of Pangolin linage of tips withen clade are appended to clade names
 	"""
 
-	print(heiarchy_old_d)
-	print(clade_old_s)
 
 	reassignCladeNames ={}
 	clade_s = set()
@@ -631,7 +629,7 @@ def main():
 	logNotes_open = open(logNotes_name, "w")
 
 
-	elif args.traitOfInterstKey == 'aa_muts':
+	if args.traitOfInterstKey == 'aa_muts':
 		if args.VOClist is None:
 			aa_mut = ["S*484*", "S*501*", "S*13*", "S*452*", "S*477*", "N*205*", "S*253*"]
 		else:
