@@ -42,18 +42,18 @@ def main():
 
 	treeAndtraits = parser.add_mutually_exclusive_group(required=True)
 	treeAndtraits.add_argument('-n', '--inNextstrain', type=str, help="nextstrain results with tree.nwk and [traitOfInterst].json")
-	treeAndtraits.add_argument('-a', '--annotatedTree', type=str, help="nexus file name with annotation: [&!traitOfInterst=value], as output py treetime ")
+	treeAndtraits.add_argument('-a', '--annotatedTree', type=str, help="nexus file name with annotation: [&!traitOfInterst=value], as output by treetime")
 
-	#defClades_group.add_argument('-n', '--inNextstrain', required=True, type=str, help="nextstrain results with tree.nwk and [traitOfInterst].json")
-	defClades_group.add_argument('-m', '--inMeta', required=True, type=str, help="metadata tsv with 'strain'	and 'date'cols, optional: cols of trait of interst; and pangolin col named: 'lineage' or 'pangolin_lin'")
-	defClades_group.add_argument('-p', '--inPangolin', required=False, type=str, default = "metadata", help="pangolin output lineage_report.csv file, if argument not supplied looks in inMeta for col with 'pangolin_lin' or 'lineage'")
-	defClades_group.add_argument("--noPangolin", action="store_true", help="do not add lineage to cade names")
+	defClades_group.add_argument('-m', '--inMeta', required=True, type=str, help="metadata tsv with 'strain' and 'date'cols, optional: cols of trait of interst; and pangolin col named:'pangolin_lineage', 'lineage' or 'pangolin_lin'")
+	defClades_group.add_argument('-p', '--inPangolin', required=False, type=str, default = "metadata", help="pangolin output lineage_report.csv file, if argument not supplied looks in inMeta for col with 'pangolin_lineage', 'pangolin_lin', or 'lineage'")
+	defClades_group.add_argument("--noPangolin", action="store_true", help="do not add lineage to clade names")
 
-	defClades_group.add_argument('-f', '--traitOfInterstFile', required=False, type=str, default="aa_muts.json",  help="name of nextstrain [traitOfInterst].json in 'inNextstrain' folder")
-	defClades_group.add_argument('-g', '--geneBoundry', required=False, type=str, help="json formated file specifing start end postions of genes in alnment for annotatedTree with aa_muts option")
+	defClades_group.add_argument('-k', '--traitOfInterstKey', required=False, type=str, default="aa_muts",  help="key for trait of interst in json file OR (if -a/--annotatedTree AND key is mutations with aa (not nuc):  use 'aa_muts')")
+	defClades_group.add_argument('-f', '--traitOfInterstFile', required=False, type=str, default="aa_muts.json",  help="[use with -n/--inNextstrain] name of [traitOfInterstFile].json in '-n/--inNextstrain' folder")
+	defClades_group.add_argument('-g', '--geneBoundry', required=False, type=str, help="[use with -a/--annotatedTree AND -k/--traitOfInterst aa_muts] json formated file specifing start end postions of genes in alignment for annotatedTree  (see example data/geneAAboundries.json)")
 
-	defClades_group.add_argument('-k', '--traitOfInterstKey', required=False, type=str, default="aa_muts",  help="key for trait of interst in json file or annotated tree file for aa with 'mutations' annotation, use 'aa_muts'")
-	defClades_group.add_argument('-mut', '--VOClist', required=False, nargs='+', help="list of aa of interest in form [GENE][*ORAncAA][site][*ORtoAA] ex. S*501*, gaps represed by X")
+	defClades_group.add_argument('-mut', '--VOClist', required=False, nargs='+', help="list of aa of interest in form [GENE][*ORAncAA][site][*ORtoAA] ex. S*501*, gaps represed by X, wild card aa represented by *")
+	defClades_group.add_argument('--auto', required=False, type=str, choices = ["Growth", "Change"], help="auto detect clades which maximize growth or change of frequency metric")
 
 
 	defClades_group.add_argument('-t', '--timeWindow', required=False, type=str, default="7", help="number of days for sampling window")
@@ -70,8 +70,10 @@ def main():
 	drawing_group.add_argument('-min', '--MINTOTALCOUNT', required=False, type=str, default="50", help="minimum total count for group to be included")
 
 	drawing_group.add_argument('-c', '--cases_name', required=False, type=str, help="file with cases - formated with 'date' in ISO format and 'confirmed_rolling' cases, in tsv format")
+	drawing_group.add_argument("--avgWindow", required=False, type=str, help="width of rolling mean window in terms of --timeWindow's (recomend using with small --timeWindow) ; default: sum of counts withen timeWindow (ie no average)")
 
-	drawing_group.add_argument('-l', '--xlabel', required=False, type=str, choices = ["date", "time"], default="date", help="Format of x axis label: ISO date format or timepoints from start")
+
+	drawing_group.add_argument('-l', '--xlabel', required=False, type=str, choices =  ["date", "time", "bimonthly"], default="date", help="Format of x axis label: ISO date format or timepoints from start, or dd-Mon-YYYY on 1st and 15th")
 	drawing_group.add_argument('-lp', '--labelPosition', required=False, type=str, default="Right", choices = ["Right", "Max", "Start", "End"], help="choose position of clade labels")
 
 	drawing_group_page  = parser.add_argument_group('Options passed to epimuller-draw for page setup')
@@ -91,6 +93,8 @@ def main():
 	commandCallDefine = "python ../../epiMuller/scripts/defineAndCountClades.py"
 	commandCallDraw = "python ../../epiMuller/scripts/drawMuller.py"
 
+	commandCallDefine = "python ../scripts/defineAndCountClades.py"
+	commandCallDraw = "python ../scripts/drawMuller.py"
 
 	#call with entry_points
 
@@ -115,10 +119,15 @@ def main():
 	else:
 		geneBoundry = ""
 
+	if args.auto is not None:
+		auto = " --auto " + args.auto + " "
+	else:
+		auto = ""
+
 
 	oscommand = " ".join([commandCallDefine, "--outDirectory", args.outDirectory , "--outPrefix", args.outPrefix ,
 	 treeAndtraits , "--inMeta", args.inMeta , "--inPangolin", args.inPangolin , 
-	 "--traitOfInterstFile", args.traitOfInterstFile , "--traitOfInterstKey", args.traitOfInterstKey , geneBoundry + noPangolin + "--timeWindow", args.timeWindow ,
+	 "--traitOfInterstFile", args.traitOfInterstFile , "--traitOfInterstKey", args.traitOfInterstKey , geneBoundry + noPangolin + auto + "--timeWindow", args.timeWindow ,
 	 "--startDate", args.startDate ,"--endDate", args.endDate])
 
 
@@ -126,6 +135,8 @@ def main():
 		oscommand = oscommand + " --VOClist"
 		for aa in args.VOClist:
 			oscommand += " " + aa
+
+
 
 
 	print("\n ### Call command ###")

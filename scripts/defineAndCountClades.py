@@ -14,6 +14,9 @@ from statistics import mode
 import scripts.parse as parse
 
 
+
+import random
+
 def readInMeta(inMeta_name, pangolin):
 	'''
 	Input: ete3 tree with node names that have 'trait' of clade specified in j_d
@@ -94,7 +97,7 @@ def readInMeta(inMeta_name, pangolin):
 
 	return(sampDate_d, sampPangolin_d, firstDate, lastDate)
 
-def annotateNwk_nextstrain(t, j_d, trait, sampDate_d, sampPangolin_d):
+def annotateNwk_nextstrain(t, j_d, trait, sampDate_d, sampPangolin_d, geneToIndex, indexToGene):
 
 	for node in t.traverse("preorder"):
 		if "NODE_" not in node.name:
@@ -108,7 +111,7 @@ def annotateNwk_nextstrain(t, j_d, trait, sampDate_d, sampPangolin_d):
 
 		if trait == "aa_muts":
 			#for gene in geneToIndex:
-			for index in range(12):
+			for index in range(len(indexToGene)):
 				gene = indexToGene[index]
 				if gene in j_d['nodes'][node.name][trait]:
 					for mut in j_d['nodes'][node.name][trait][gene]:
@@ -139,7 +142,7 @@ def treetimeToTraits_d(parseT, traitOfInterstKey):
 	return nodeTraits_d
 
 
-def annotateNwk_treetime(t, nodeTraits_d, trait, geneBoundry_d, sampDate_d, sampPangolin_d):
+def annotateNwk_treetime(t, nodeTraits_d, trait, geneBoundry_d, sampDate_d, sampPangolin_d, geneToIndex, indexToGene):
 	
 	for node in t.traverse("preorder"):
 		if "NODE_" not in node.name:
@@ -177,11 +180,11 @@ def annotateNwk_treetime(t, nodeTraits_d, trait, geneBoundry_d, sampDate_d, samp
 	return(t)
 
 
-def calcCladeGrowth(desendantsPerWeek_d, totalPerWeek_d):
+def calcCladeGrowth(desendantsPerWeek_d, totalPerWeek_d, excludeWeeks_s):
 	'''returns metric for average change in frequency, of weeks which increase in frequency of samples desendant of node increase'''
 	hasStarted = False
-	weeksOfGrowth = 0
-	sumOfGrowth = 0
+	weeksOfGrowth = 1
+	sumOfGrowth = 1
 	for i in range(len(desendantsPerWeek_d.keys())):
 		week = i + 1
 		if desendantsPerWeek_d[week] > 0 and not hasStarted:
@@ -197,7 +200,7 @@ def calcCladeGrowth(desendantsPerWeek_d, totalPerWeek_d):
 			previousWeek = currentFreq
 	return(sumOfGrowth/weeksOfGrowth)
 
-def calcCladeChange(desendantsPerWeek_d, totalPerWeek_d):
+def calcCladeChange(desendantsPerWeek_d, totalPerWeek_d, excludeWeeks_s):
 	'''returns metric for average abs change in frequency of samples desendant of node'''
 	hasStarted = False
 	weeksOfChange = 0
@@ -221,13 +224,14 @@ def calcCladeChange(desendantsPerWeek_d, totalPerWeek_d):
 
 def calcCurrentScore(t, cladeDefineNodes_l, cladeMetrics_l):
 	'''retruns score for set of clades'''
+	cladeSetMetric = 0
 	for node in t.traverse("preorder"):
 		if node in cladeDefineNodes_l:
 			if not node.is_root(): # skips saving for first step in tree
 				cladeSetMetric += sumMetricInClade/nodesInClade
 
 			currentClade = node
-			currentMetirc = cladeMetrics_l[cladeDefineNodes_l.index(clade)]
+			currentMetirc = cladeMetrics_l[cladeDefineNodes_l.index(currentClade)]
 			nodesInClade = 1
 			sumMetricInClade = currentMetirc
 		else:
@@ -235,15 +239,15 @@ def calcCurrentScore(t, cladeDefineNodes_l, cladeMetrics_l):
 			nodesInClade += 1
 	return cladeSetMetric
 
-def step_cladeStarts(k, cladeDefineNodes_l):
+def step_cladeStarts(t, k, iterations, cladeDefineNodes_l, totalPerWeek_d, excludeWeeks_s, autoMetric):
 	'''Takes list of clades descibed by initiating nodes, and randomly shifts clade starts up and down, accepting moves which imporve score '''
 	cladeMetrics_l = []
 	for cladeNode in cladeDefineNodes_l:
 		if autoMetric == "Growth":
-			metric = calcCladeGrowth(cladeNode.desendantsPerWeek_d, totalPerWeek_d)
+			metric = calcCladeGrowth(cladeNode.desendantsPerWeek_d, totalPerWeek_d, excludeWeeks_s)
 		else:
-			metric = calcCladeChange(cladeNode.desendantsPerWeek_d, totalPerWeek_d)
-		cladeMetrics_l.appened(metric)
+		 	metric = calcCladeChange(cladeNode.desendantsPerWeek_d, totalPerWeek_d, excludeWeeks_s)
+		cladeMetrics_l.append(metric)
 
 	cladeSetMetric = 0
 	previousCladeSetMetric = 0
@@ -263,17 +267,17 @@ def step_cladeStarts(k, cladeDefineNodes_l):
 		changeClade_index = random.randint(0, k-1)
 		updatedClade = cladeDefineNodes_l[changeClade_index]
 		if random.randint(0, 1):
-			updatedClade = updatedClade.up()
+			updatedClade = updatedClade.up
 		else:
 			if not updatedClade.is_leaf():
-				updatedClade = random.sample(updatedClade.children, 1)
+				updatedClade = random.sample(updatedClade.children, 1)[0]
 
 		cladeDefineNodes_l[changeClade_index] = updatedClade
 
 		if autoMetric == "Growth":
-			metric = calcCladeGrowth(updatedClade.desendantsPerWeek_d, totalPerWeek_d)
+			metric = calcCladeGrowth(updatedClade.desendantsPerWeek_d, totalPerWeek_d, excludeWeeks_s)
 		else:
-			metric = calcCladeChange(updatedClade.desendantsPerWeek_d, totalPerWeek_d)
+			metric = calcCladeChange(updatedClade.desendantsPerWeek_d, totalPerWeek_d, excludeWeeks_s)
 		cladeMetrics_l[changeClade_index] = metric
 
 	return(cladeDefineNodes_l, cladeSetMetric)
@@ -295,7 +299,7 @@ def assignByAutoDetect(t, cladeDefineNodes_final):
 			heiarchy_d[cladeName] = currentClade
 			currentClade = cladeName
 			assignment_d[node.name] = currentClade
-			for des_node in node.iter_descendants()
+			for des_node in node.iter_descendants():
 				assignment_d[des_node.name] = currentClade
 
 
@@ -337,7 +341,7 @@ def annotateNwk_autoDetect_assignClades(t, autoMetric, k, N, iterations, starts,
 			node.add_features(numDesendants = 0)
 			node.add_features(desendantsPerWeek_d = desendantsPerWeek_d_empty.copy())
 			for week in weekBoundries_d:
-				if tip_date < weekBoundries_d[week][1] and tip_date >= weekBoundries_d[week][0]:
+				if date.fromisoformat(tipDate) < weekBoundries_d[week][1] and date.fromisoformat(tipDate) >= weekBoundries_d[week][0]:
 					node.desendantsPerWeek_d[week] += 1
 					totalPerWeek_d[week] += 1
 		else:
@@ -351,7 +355,7 @@ def annotateNwk_autoDetect_assignClades(t, autoMetric, k, N, iterations, starts,
 
 	excludeWeeks_s = set()
 	for week in totalPerWeek_d:
-		if totalPerWeek_d < N:
+		if totalPerWeek_d[week] < N:
 			excludeWeeks_s.add(week)
 
 
@@ -359,19 +363,19 @@ def annotateNwk_autoDetect_assignClades(t, autoMetric, k, N, iterations, starts,
 	cladeDefineNodes_final = []
 	for i in range(starts):
 		cladeDefineNodes_l = random.sample(internalNodes_l, k) + [t.get_tree_root()]
-		cladeDefineNodes_l, cladeSetMetric = step_cladeStarts(k, cladeDefineNodes_l)
+		cladeDefineNodes_l, cladeSetMetric = step_cladeStarts(t, k, iterations, cladeDefineNodes_l, totalPerWeek_d, excludeWeeks_s, autoMetric)
 
 		if cladeSetMetric > cladeSetMetric_final:
 			cladeSetMetric_final = cladeSetMetric
 			cladeDefineNodes_final = cladeDefineNodes_l
 
-	assignment_d, heiarchy_d, clade_s = assignByAutoDetect(t, cladeDefineNodes_final):
+	assignment_d, heiarchy_d, clade_s = assignByAutoDetect(t, cladeDefineNodes_final)
 
 
 	return(assignment_d, heiarchy_d, clade_s)
 
 
-def assignToSpecAA(t, mutList, logNotes_open):
+def assignToSpecAA(t, mutList, logNotes_open, geneToIndex):
 	'''
 	input: annotated tree (t) and aa mut (mutList) to look for
 	output:
@@ -468,7 +472,7 @@ def assignToNucMut(t, mutList, logNotes_open):
 		mutOfInterst_count = 0
 
 		for mutToFind in mutList:
-			for currentMut in nodeMut_one:
+			for nodeMut_one in nodeMut_l:
 				if mutToFind[1:-1] == nodeMut_one[1:-1]:
 					if mutToFind[0] == "*" or mutToFind[0] == nodeMut_one[0]:
 						if mutToFind[-1] == "*" or mutToFind[-1] == nodeMut_one[-1]:
@@ -551,6 +555,9 @@ def assignCladeToLin(assignment_old_d, heiarchy_old_d, clade_old_s):
 	mode of Pangolin linage of tips withen clade are appended to clade names
 	"""
 
+	print(heiarchy_old_d)
+	print(clade_old_s)
+
 	reassignCladeNames ={}
 	clade_s = set()
 	assignment_d = {}
@@ -579,6 +586,8 @@ def assignCladeToLin(assignment_old_d, heiarchy_old_d, clade_old_s):
 	for child in heiarchy_old_d:
 		parent = heiarchy_old_d[child]
 		if parent != 'NA':
+			print("parent clade", reassignCladeNames[parent])
+			print("child clade", reassignCladeNames[child])
 			heiarchy_d[reassignCladeNames[child]] = reassignCladeNames[parent]
 		else:
 			heiarchy_d[reassignCladeNames[child]] = parent
@@ -674,27 +683,27 @@ def main():
 	##########################  parse user arguments
 	parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
+	parser.add_argument('-oDir', '--outDirectory', required=False, default ="./", type=str, help="folder for output")
+	parser.add_argument('-oP', '--outPrefix', required=True, type=str, help="prefix of out files withen outDirectory")
+
+
 	treeAndtraits = parser.add_mutually_exclusive_group(required=True)
-	treeAndtraits.add_argument('-n', '--inNextstrain', type=str, help="nextstrain results with tree.nwk and [traitOfInterst].json")
-	treeAndtraits.add_argument('-a', '--annotatedTree', type=str, help="nexus file name, annotated with format used by TreeTime")
+	treeAndtraits.add_argument('-n', '--inNextstrain', type=str, help="nextstrain results with tree.nwk and [traitOfInterstFile].json")
+	treeAndtraits.add_argument('-a', '--annotatedTree', type=str, help="nexus file name with annotation: [&!traitOfInterstKey=value], as output by treetime")
 
 
-	parser.add_argument('-m', '--inMeta', required=True, type=str, help="metadata tsv with 'strain'	and 'date'cols, optional: cols of trait of interst; and pangolin col named: 'lineage' or 'pangolin_lin'")
+	parser.add_argument('-m', '--inMeta', required=True, type=str, help="metadata tsv with 'strain'	and 'date'cols, optional: col for  [traitOfInterstKey]; and pangolin col named: 'pangolin_lineage' 'lineage' or 'pangolin_lin'")
 	parser.add_argument('-p', '--inPangolin', required=False, type=str, default = "metadata", help="pangolin output lineage_report.csv file, if argument not supplied looks in inMeta for col with 'pangolin_lineage', 'pangolin_lin', or 'lineage'")
-	parser.add_argument("--noPangolin", action="store_true", help="do not add lineage to cade names")
+	parser.add_argument("--noPangolin", action="store_true", help="do not add lineage to clade names")
 
 
-	parser.add_argument('-f', '--traitOfInterstFile', required=False, type=str, default="aa_muts.json",  help="[use with -n/--inNextstrain] name of [traitOfInterst].json in '-n/--inNextstrain' folder")
+	parser.add_argument('-k', '--traitOfInterstKey', required=False, type=str, default="aa_muts",  help="key for trait of interst in json file OR (if -a/--annotatedTree AND key is mutations with aa (not nuc):  use 'aa_muts')")
+	parser.add_argument('-f', '--traitOfInterstFile', required=False, type=str, default="aa_muts.json",  help="[use with -n/--inNextstrain] name of [traitOfInterstFile].json in '-n/--inNextstrain' folder")
 	parser.add_argument('-g', '--geneBoundry', required=False, type=str, help="[use with -a/--annotatedTree AND -k/--traitOfInterst aa_muts] json formated file specifing start end postions of genes in alignment for annotatedTree  (see example data/geneAAboundries.json)")
-	parser.add_argument('-k', '--traitOfInterstKey', required=False, type=str, default="aa_muts",  help="key for trait of interst in json file or annotated tree file. If -a/--annotatedTree 'mutations' are amino acids use 'aa_muts'")
+	
 
 	parser.add_argument('-mut', '--VOClist', required=False, nargs='+', help="list of aa of interest in form [GENE][*ORAncAA][site][*ORtoAA] ex. S*501*, gaps represented by X, wild card aa represented by *")
 	parser.add_argument('--auto', required=False, type=str, choices = ["Growth", "Change"], help="auto detect clades which maximize growth or change of frequency metric")
-
-
-
-	parser.add_argument('-oDir', '--outDirectory', required=False, default ="./", type=str, help="folder for output")
-	parser.add_argument('-oP', '--outPrefix', required=True, type=str, help="prefix of out files withen outDirectory")
 
 
 	parser.add_argument('-t', '--timeWindow', required=False, type=str, default="7", help="number of days for sampling window")
@@ -745,7 +754,7 @@ def main():
 
 
 		#annotate tree with ancestral reconstruction
-		if args.auto is not None:
+		if args.auto is None:
 			inJSON_name = os.path.join(args.inNextstrain, args.traitOfInterstFile)
 			j_d = json.load(open(inJSON_name))
 			
@@ -756,16 +765,19 @@ def main():
 				indexToGene_temp = {}
 				for node in j_d['nodes'].keys():
 					for gene in j_d['nodes'][node]["aa_muts"].keys():
-						if gene not in geneToIndex:
+						if gene not in geneToIndex_temp:
 							geneToIndex_temp[gene] = i
 							indexToGene_temp[i] = gene
 							i += 1
-				global geneToIndex
+				# global geneToIndex
 				geneToIndex = geneToIndex_temp.copy()
-				global indexToGene
+				# global indexToGene
 				indexToGene = indexToGene_temp.copy()
+			else:
+				geneToIndex = {}
+				indexToGene = {}
 
-			t = annotateNwk_nextstrain(t, j_d, args.traitOfInterstKey, sampDate_d, sampPangolin_d)
+			t = annotateNwk_nextstrain(t, j_d, args.traitOfInterstKey, sampDate_d, sampPangolin_d, geneToIndex, indexToGene)
 	#use treetime ancestral as input
 	else: 
 		parseT = parse.treeImport_wrap(args.annotatedTree, ["nexus", "treetimeAnnot"])
@@ -786,20 +798,22 @@ def main():
 					geneToIndex_temp = {}
 					indexToGene_temp = {}
 					for gene in geneBoundry_d.keys():
-						if gene not in geneToIndex:
+						if gene not in geneToIndex_temp:
 							geneToIndex_temp[gene] = i
 							indexToGene_temp[i] = gene
 							i += 1
-					global geneToIndex
+					#global geneToIndex
 					geneToIndex = geneToIndex_temp.copy()
-					global indexToGene
+					#global indexToGene
 					indexToGene = indexToGene_temp.copy()
 			else:
 				geneBoundry_d = {}
+				geneToIndex = {}
+				indexToGene = {}
 
 
 			nodeTraits_d = treetimeToTraits_d(parseT, args.traitOfInterstKey)
-			t = annotateNwk_treetime(t, nodeTraits_d, args.traitOfInterstKey, geneBoundry_d,  sampDate_d, sampPangolin_d)
+			t = annotateNwk_treetime(t, nodeTraits_d, args.traitOfInterstKey, geneBoundry_d,  sampDate_d, sampPangolin_d, geneToIndex, indexToGene)
 
 
 	######################### make clades assignments (assignment_d: key: leaf node name; value: clade) and heierarchy (heiarchy_d: key:child clade; value:parent clade )
@@ -819,7 +833,7 @@ def main():
 
 	if args.auto is not None:
 		#t, autoMetric, k (number clades), N (min samples for week to count), iterations (steps to take withen each start), starts (number of random initial starts), startDate, endDate, delta, sampDate_d, sampPangolin_d
-		assignment_d, heiarchy_d, clade_s = annotateNwk_autoDetect_assignClades(t, args.autoMetric, 5, 10, 100, 10, startDate, endDate, delta, sampDate_d, sampPangolin_d)
+		assignment_d, heiarchy_d, clade_s = annotateNwk_autoDetect_assignClades(t, args.auto, 5, 10, 100, 10, startDate, endDate, delta, sampDate_d, sampPangolin_d)
 
 	elif args.traitOfInterstKey == 'aa_muts':
 		if args.VOClist is None:
@@ -830,7 +844,7 @@ def main():
 		print("\n")
 		print("Searching for aa muations with:", aa_mut)
 		logNotes_open.write("\n"+"Searching for aa muations with:"+str(aa_mut)+"\n")
-		assignment_d, heiarchy_d, clade_s = assignToSpecAA(t, aa_mut, logNotes_open)
+		assignment_d, heiarchy_d, clade_s = assignToSpecAA(t, aa_mut, logNotes_open, geneToIndex)
 	elif args.traitOfInterstKey == 'mutations' or args.traitOfInterstKey == 'muts':
 		if args.VOClist is None:
 			nuc_mut = ["*23063*", "*22320*"] #mostly for testing purposes 
@@ -840,7 +854,7 @@ def main():
 		print("\n")
 		print("Searching for muations with:", nuc_mut)
 		logNotes_open.write("\n"+"Searching for muations with:"+str(nuc_mut)+"\n")
-		assignment_d, heiarchy_d, clade_s = assignToNucMut(t, mutList, logNotes_open)
+		assignment_d, heiarchy_d, clade_s = assignToNucMut(t, nuc_mut, logNotes_open)
 	else:
 		print("\n"+"Finding clades defined by"+str(args.traitOfInterstKey))
 		logNotes_open.write("\n"+"Finding clades defined by"+str(args.traitOfInterstKey)+"\n")

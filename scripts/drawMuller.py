@@ -379,7 +379,7 @@ def main():
 	parser.add_argument('-a', '--abundance_name', required=True, type=str, help="csv output from mutationLinages_report.py with abundances of clades")
 
 	parser.add_argument('-c', '--cases_name', required=False, type=str, help="file with cases - formated with 'date' in ISO format and 'confirmed_rolling' cases, in tsv format")
-	parser.add_argument("--avgWindow", required=False, type=str, help="width of averaging window for cases (recomend using with small --timeWindow) ; default: total calculated in time window with not averaging")
+	parser.add_argument("--avgWindow", required=False, type=str, help="width of rolling mean window in terms of --timeWindow's (recomend using with small --timeWindow) ; default: sum of counts withen timeWindow (ie no average)")
 
 	parser.add_argument('-o', '--outFolder', required=True, type=str, help="csv output from mutationLinages_report.py with child parent col") 
 
@@ -387,7 +387,7 @@ def main():
 	parser.add_argument('-mt', '--MINTIME', required=False, type=str, default="30", help="minimum time point to start plotting")
 	parser.add_argument('-min', '--MINTOTALCOUNT', required=False, type=str, default="50", help="minimum total count for group to be included")
 
-	parser.add_argument('-l', '--xlabel', required=False, type=str, choices = ["date", "time", "bimonthly"], default="date", help="Format of x axis label: ISO date format or timepoints from start, or dd-Mon-YYYY on 1st and 15th best for -t 1")
+	parser.add_argument('-l', '--xlabel', required=False, type=str, choices = ["date", "time", "bimonthly"], default="date", help="Format of x axis label: ISO date format or timepoints from start, or dd-Mon-YYYY on 1st and 15th")
 	parser.add_argument('-lp', '--labelPosition', required=False, type=str, default="Right", choices = ["Right", "Max", "Start", "End"], help="choose position of clade labels")
 	#parser.add_argument("--tmrca", action="store_true", help="draw point at tmrca of clade if flag is used")
 
@@ -507,6 +507,7 @@ def main():
 
 ########################## parse clades
 	times_l = abundances_d.keys()
+	times_l = list(times_l)
 	#timeLabs_s = set()
 	clades_l = []
 	root_clades_l = []
@@ -565,9 +566,14 @@ def main():
 
 	#record abundances in objects
 	allTimes_l = []
+	minTimeOfAbundance = 'NA'
 	for time in abundances_d:
 
 		if int(time) >= int(args.MINTIME):
+			if minTimeOfAbundance == 'NA':
+				minTimeOfAbundance = time
+			elif int(minTimeOfAbundance) > int(time):
+				minTimeOfAbundance = time
 			t = Snapshot(time, timeToDate_d[time])
 			for clade in clades_l:
 				if clade.name in abundances_d[time]:
@@ -578,7 +584,11 @@ def main():
 				t.cladeSnapshot_clade_d[clade.name] = clade_oneTime
 				t.sumAll += abundance
 				clade.cladeSnapshot_time_d[time] = clade_oneTime
-			allTimes_l.append(t)
+			if t.sumAll > 0: 
+				allTimes_l.append(t)
+			else:
+				times_l.remove(time)
+				print("No samples during time: ", time)
 
 	#calculate Descendants and children
 	for snap in allTimes_l:
@@ -616,8 +626,10 @@ def main():
 			defineChildBoundries(snap.time, scaleFactor, cladeSnap, y1, y2)
 
 
+
+
 	scaleTime = (WIDTH-(MARGIN+LEGENDWIDTH))/len(times_l)
-	drawWrapper(args.outFolder, "relative_abundance", root_clades_l, scaleTime, times_l, 100, args.MINTIME, args.labelPosition, args.xlabel, timeToDate_d)
+	drawWrapper(args.outFolder, "relative_abundance", root_clades_l, scaleTime, times_l, 100, minTimeOfAbundance, args.labelPosition, args.xlabel, timeToDate_d)
 
 
 
@@ -661,7 +673,7 @@ def main():
 
 
 	scaleTime = (WIDTH-(MARGIN+LEGENDWIDTH))/len(times_l)
-	drawWrapper(args.outFolder, "sequence_scaled_lineages", root_clades_l, scaleTime, times_l, maxCount,   args.MINTIME, args.labelPosition, args.xlabel, timeToDate_d)
+	drawWrapper(args.outFolder, "sequence_scaled_lineages", root_clades_l, scaleTime, times_l, maxCount, minTimeOfAbundance, args.labelPosition, args.xlabel, timeToDate_d)
 
 
 
@@ -759,7 +771,7 @@ def main():
 
 
 		scaleTime = (WIDTH-(MARGIN+LEGENDWIDTH))/len(times_l)
-		drawWrapper(args.outFolder, "case_scaled_lineages", root_clades_l, scaleTime, times_l, maxCount, args.MINTIME, args.labelPosition, args.xlabel, timeToDate_d)
+		drawWrapper(args.outFolder, "case_scaled_lineages", root_clades_l, scaleTime, times_l, maxCount, minTimeOfAbundance, args.labelPosition, args.xlabel, timeToDate_d)
 	else:
 		print("No case data supplied - skipping case scaled plot")
 
