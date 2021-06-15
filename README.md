@@ -8,7 +8,7 @@
 Jennifer L. Havens
 
 ###### Purpose
-Visualize lineages overtime, with phylogentic context, based on viral genomes.
+Visualize lineages overtime, with phylogenetic context, based on viral genomes.
 
 ###### Language
 Python3
