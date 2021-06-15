@@ -53,8 +53,6 @@ def main():
 	defClades_group.add_argument('-g', '--geneBoundry', required=False, type=str, help="[use with -a/--annotatedTree AND -k/--traitOfInterst aa_muts] json formated file specifing start end postions of genes in alignment for annotatedTree  (see example data/geneAAboundries.json)")
 
 	defClades_group.add_argument('-mut', '--VOClist', required=False, nargs='+', help="list of aa of interest in form [GENE][*ORAncAA][site][*ORtoAA] ex. S*501*, gaps represed by X, wild card aa represented by *")
-	defClades_group.add_argument('--auto', required=False, type=str, choices = ["Growth", "Change"], help="auto detect clades which maximize growth or change of frequency metric")
-
 
 	defClades_group.add_argument('-t', '--timeWindow', required=False, type=str, default="7", help="number of days for sampling window")
 	defClades_group.add_argument('-s', '--startDate', required=False, type=str, default='2020-03-01', help="start date in iso format YYYY-MM-DD or 'firstDate' which sets start date to first date in metadata")
@@ -93,13 +91,13 @@ def main():
 	commandCallDefine = "python ../../epiMuller/scripts/defineAndCountClades.py"
 	commandCallDraw = "python ../../epiMuller/scripts/drawMuller.py"
 
-	commandCallDefine = "python ../scripts/defineAndCountClades.py"
-	commandCallDraw = "python ../scripts/drawMuller.py"
+	# commandCallDefine = "python ../scripts/defineAndCountClades.py"
+	# commandCallDraw = "python ../scripts/drawMuller.py"
 
 	#call with entry_points
 
-	# commandCallDefine = "epimuller-define"
-	# commandCallDraw = "epimuller-draw"
+	commandCallDefine = "epimuller-define"
+	commandCallDraw = "epimuller-draw"
 
 
 	########################### call defineAndCountClades.py
@@ -119,10 +117,6 @@ def main():
 	else:
 		geneBoundry = ""
 
-	if args.auto is not None:
-		auto = " --auto " + args.auto + " "
-	else:
-		auto = ""
 
 
 	oscommand = " ".join([commandCallDefine, "--outDirectory", args.outDirectory , "--outPrefix", args.outPrefix ,
